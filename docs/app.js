@@ -67,6 +67,7 @@ function renderTasks(taskArray) {
         due.classList.add("task-due");
 
         const actions = document.createElement("div");
+        actions.classList.add("task-actions");
         const editButton = document.createElement("button");
         const deleteButton = document.createElement("button");
 
@@ -83,6 +84,18 @@ function renderTasks(taskArray) {
             + "/" + date.getDate()
             + " " + hour
             + ":" + minute;
+
+            const now = new Date();
+
+            const today = new Date();
+            today.setHours(23,59,59,999);
+
+            if (date < now) {
+                due.style.color = "#d32f2f";
+            }
+            else if (date <= today) {
+                due.style.color = "#f57c00";
+            }
         }
         deleteButton.textContent = "🗑";
         editButton.textContent = "🖋️";
@@ -165,6 +178,7 @@ function loadTasks() {
 
 //タスク編集画面を開く
 function openEditModal(task) {
+
     editingTaskId = task.id;
 
     editTitle.value = task.title;
@@ -174,11 +188,14 @@ function openEditModal(task) {
     editTitle.select();
 
     modal.classList.remove("hidden");
+    
 }
 
 //編集画面を閉じる
 function closeEditModal() {
+
     modal.classList.add("hidden");
+
     editingTaskId = null;
     document.activeElement.blur();
 }
