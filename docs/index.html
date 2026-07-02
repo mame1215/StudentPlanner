@@ -6,6 +6,23 @@
     <title>Task Manager</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <div id="modal" class="hidden">
+        <div id="modalContent">
+
+            <h2>タスクを編集</h2>
+
+            <label>タイトル</label>
+            <input type="text" id="editTitle">
+
+            <label>期限</label>
+            <input type="datetime-local" id="editDue">
+
+            <button id="saveButton">保存</button>
+            <button id="cancelButton">キャンセル</button>
+            
+        </div>
+    </div>
 </head>
 
 <body>

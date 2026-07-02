@@ -87,3 +87,28 @@ li input[type="checkbox"] {
     text-decoration: line-through;
     color: gray;
 }
+
+#modal {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.4);
+
+    justify-content: center;
+    align-items: center;
+}
+
+#modal.hidden {
+    display: none;
+}
+
+#modal:not(.hidden) {
+    display: flex;
+}
+
+#modalContent {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 400px;
+}

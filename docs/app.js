@@ -11,14 +11,22 @@ let tasks = [
     }
 ];
 
+let editingTaskId = null;
+
 const taskList = document.getElementById("taskList");
 const taskInput = document.getElementById("taskInput");
 const addTaskButton = document.getElementById("addTaskButton");
 const dueInput = document.getElementById("dueInput")
 
+const modal = document.getElementById("modal");
+const editTitle = document.getElementById("editTitle");
+const editDue = document.getElementById("editDue");
+const saveButton = document.getElementById("saveButton");
+const cancelButton = document.getElementById("cancelButton");
+
 //タスクのリストを更新
 function renderTasks(taskArray) {
-    
+
     //期限順に並び替え
     const sortedTasks = [...taskArray];
     sortedTasks.sort(function (a, b) {
@@ -58,7 +66,9 @@ function renderTasks(taskArray) {
         title.classList.add("task-title");
         due.classList.add("task-due");
 
-        const button = document.createElement("button");
+        const actions = document.createElement("div");
+        const editButton = document.createElement("button");
+        const deleteButton = document.createElement("button");
 
         title.textContent = task.title;
         if (task.due) {
@@ -74,7 +84,8 @@ function renderTasks(taskArray) {
             + " " + hour
             + ":" + minute;
         }
-        button.textContent = "🗑"
+        deleteButton.textContent = "🗑";
+        editButton.textContent = "🖋️";
         checkbox.checked = task.completed;
 
         checkbox.addEventListener("change", function () {
@@ -83,17 +94,25 @@ function renderTasks(taskArray) {
             renderTasks(tasks);
         });
 
-        button.addEventListener("click",function () {
+        deleteButton.addEventListener("click",function () {
             deleteTask(task.id);
             renderTasks(tasks);
+        });
+
+        editButton.addEventListener("click", function () {
+            openEditModal(task);
         });
 
         content.appendChild(title);
         content.appendChild(due);
 
+        actions.appendChild(editButton);
+        actions.appendChild(deleteButton);
+
         li.appendChild(checkbox);
         li.appendChild(content);
-        li.appendChild(button);
+
+        li.appendChild(actions);
         taskList.appendChild(li);
     }
 }
@@ -144,6 +163,26 @@ function loadTasks() {
     }
 }
 
+//タスク編集画面を開く
+function openEditModal(task) {
+    editingTaskId = task.id;
+
+    editTitle.value = task.title;
+    editDue.value = task.due;
+
+    editTitle.focus();
+    editTitle.select();
+
+    modal.classList.remove("hidden");
+}
+
+//編集画面を閉じる
+function closeEditModal() {
+    modal.classList.add("hidden");
+    editingTaskId = null;
+    document.activeElement.blur();
+}
+
 loadTasks();
 renderTasks(tasks);
 
@@ -152,6 +191,45 @@ addTaskButton.addEventListener("click", function () {
 
     submitTask();
 
+});
+
+//編集後に保存
+saveButton.addEventListener("click", function () {
+
+    const task = tasks.find(task => task.id === editingTaskId);
+
+    if (task) {
+        task.title = editTitle.value;
+        task.due = editDue.value;
+
+        saveTasks();
+        renderTasks(tasks);
+        closeEditModal();
+    }
+
+});
+
+//編集キャンセル
+cancelButton.addEventListener("click", function () {
+    closeEditModal();
+});
+
+//編集キャンセル（modal以外を押したとき）
+modal.addEventListener("click", function (event) {
+
+    if (event.target === modal){
+        closeEditModal();
+    }
+});
+
+//編集キャンセル（esc）
+document.addEventListener("keydown", function (event) {
+    if (
+        event.key === "Escape" &&
+        !modal.classList.contains("hidden")
+    ){
+        closeEditModal();
+    }
 });
 
 //Enterで入力欄のを追加
