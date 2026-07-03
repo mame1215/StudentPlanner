@@ -2,12 +2,26 @@ let tasks = [
     {
         id: 1,
         title: "数学",
-        completed: false
-    },
-    {
-        id:2,
-        title: "英語",
-        completed: false
+
+        completed: false,
+        conpletedAt: null,
+
+        due: "",
+
+        plan: {
+            start: "",
+            end: ""
+        },
+
+        priorty: 3,
+
+        subject: "",
+
+        tags: [],
+
+        items: [],
+
+        memo: ""
     }
 ];
 
@@ -21,6 +35,7 @@ const dueInput = document.getElementById("dueInput")
 const modal = document.getElementById("modal");
 const editTitle = document.getElementById("editTitle");
 const editDue = document.getElementById("editDue");
+const editPriority = document.getElementById("editPriority");
 const saveButton = document.getElementById("saveButton");
 const cancelButton = document.getElementById("cancelButton");
 
@@ -133,10 +148,28 @@ function renderTasks(taskArray) {
 //タスクに追加
 function addTask(taskName, deadline) {
     tasks.push({
-        id: Date.now(),
+        id: tasks.length + 1,
         title: taskName,
+
         completed: false,
-        due: deadline
+        completedAt: null,
+
+        due: deadline,
+
+        plan: {
+            start: "",
+            end: ""
+        },
+
+        priority: 3,
+
+        subject: "",
+
+        tags: [],
+
+        items: [],
+
+        memo: ""
     });
 
     saveTasks();
@@ -183,6 +216,7 @@ function openEditModal(task) {
 
     editTitle.value = task.title;
     editDue.value = task.due;
+    editPriority.value = task.priority;
 
     editTitle.focus();
     editTitle.select();
@@ -218,6 +252,7 @@ saveButton.addEventListener("click", function () {
     if (task) {
         task.title = editTitle.value;
         task.due = editDue.value;
+        task.priority = Number(editPriority.value);
 
         saveTasks();
         renderTasks(tasks);
