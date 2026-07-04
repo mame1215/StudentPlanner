@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Manager</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -22,16 +22,32 @@
             id="taskInput"
             placeholder="タスク名を入力">
 
-        <input class="text-input" type="datetime-local" id="dueInput">
+        <div class="input-area-row">
+            <input class="text-input" type="datetime-local" id="dueInput">
 
-        <label>優先度</label>
-        <select id="editPriority">
-            <option value="5">★★★★★</option>
-            <option value="4">★★★★☆</option>
-            <option value="3" selected>★★★☆☆</option>
-            <option value="2">★★☆☆☆</option>
-            <option value="1">★☆☆☆☆</option>
-        </select>
+            <select id="priorityInput">
+                <option value="5">🔴 最優先</option>
+                <option value="4">🟠 高</option>
+                <option value="3" selected>🟡 中</option>
+                <option value="2">🟢 低</option>
+                <option value="1">⚪ 最低</option>
+            </select>
+
+            <select id="subjectInput">
+                <option value="">教科なし</option>
+            </select>
+        </div>
+
+        <div class="tag-group">
+            <span>タグ</span>
+
+            <div id="tagInput"></div>
+        </div>
+
+        <textarea
+            id="memoInput"
+            placeholder="メモ（任意）"
+            rows="3"></textarea>
 
         <button id="addTaskButton">
             + タスク追加
@@ -49,6 +65,18 @@
             <label>期限</label>
             <input type="datetime-local" id="editDue">
 
+            <label>優先度</label>
+                <select id="editPriority">
+                    <option value="5">🔴 最優先</option>
+                    <option value="4">🟠 高</option>
+                    <option value="3" selected>🟡 中</option>
+                    <option value="2">🟢 低</option>
+                    <option value="1">⚪ 最低</option>
+                </select>
+            
+            <label>教科</label>
+            <select id="editSubject"></select>
+
             <div class="modal-buttons">
                 <button id="cancelButton" class="secondary-button">
                     キャンセル
@@ -61,6 +89,6 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
