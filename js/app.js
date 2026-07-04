@@ -35,7 +35,8 @@ const subjects = [
 ];
 
 const tags = [
-    { id: 1, name: "提出物", color: "#ef5350" }
+    { id: 1, name: "提出物", color: "#ef5350" },
+    { id: 2, name: "イベント", color: "#ef5350" }
 ];
 
 const priorityText = [
@@ -67,11 +68,14 @@ function loadSubjects(selectElement) {
     }
 }
 
-function loadTags() {
+function loadTags(container) {
+
+    container.innerHTML = "";
 
     for(const tag of tags) {
         
         const label = document.createElement("label");
+        label.classList.add("tag-option");
 
         const checkbox = document.createElement("input");
 
@@ -81,7 +85,7 @@ function loadTags() {
         label.appendChild(checkbox);
         label.append(" " + tag.name);
 
-        tagInput.appendChild(label);
+        container.appendChild(label);
     }
 }
 
@@ -103,7 +107,8 @@ const editPriority = document.getElementById("editPriority");
 const saveButton = document.getElementById("saveButton");
 const cancelButton = document.getElementById("cancelButton");
 const editSubject = document.getElementById("editSubject");
-console.log(editSubject);
+const editTagInput = document.getElementById("editTagInput");
+const editMemo = document.getElementById("editMemo");
 
 //タスクのリストを更新
 function renderTasks(taskArray) {
@@ -169,30 +174,101 @@ function addTask(taskName, deadline, priority,memo, subjectId, tagIds) {
     saveTasks();
 }
 
-//入力欄から読み取り、タスクに追加し、画面を更新
-function submitTask() {
-    const newTask = taskInput.value.trim();
-    const deadline = dueInput.value;
+function getSelectedTagIds(container) {
 
     const tagIds = [];
+    
+    const checked =
+        container.querySelectorAll("input:checked");
 
-    const checkedTags =
-        tagInput.querySelectorAll("input:checked");
-
-    for (const checkbox of checkedTags) {
+    for (const checkbox of checked) {
         tagIds.push(Number(checkbox.value));
     }
 
+    return tagIds;
+}
+
+function getSelectedSubject(selectElement){
+
+    if(selectElement.value === ""){
+        return null;
+    }
+
+    return Number(selectElement.value);
+}
+
+function getPriority(selectElement) {
+    return Number(selectElement.value);
+}
+
+function getTaskFormData(){
+
+    return {
+
+        title:
+            taskInput.value.trim(),
+
+        due:
+            dueInput.value,
+
+        priority:
+            getpriority(priorityInput),
+
+        memo:
+            memoInput.value.trim(),
+
+        subjectId:
+            getSelectedSubject(subjectInput),
+
+        tagIds:
+            getSelectedTagIds(tagInput)
+    };
+}
+
+function getEditFormData(){
+
+    return {
+
+        title:
+            editTitle.value.trim(),
+
+        due:
+            editDue.value,
+
+        priority:
+            getPriority(editPriority),
+
+        memo:
+            editMemo.value.trim(),
+
+        subjectId:
+            getSelectedSubject(editSubject),
+
+        tagIds:
+            getSelectedTagIds(editTagInput)
+    };
+}
+
+//入力欄から読み取り、タスクに追加し、画面を更新
+function submitTask() {
+
+    const form = getTaskFormData();
+    
     if(newTask !== ""){
         addTask(
-            newTask,
-            deadline,
-            Number(priorityInput.value),
-            memoInput.value.trim(),
-            subjectInput.value === ""
-                ? null
-                : Number(subjectInput.value),
-            tagIds
+
+            form.title,
+
+            form.due,
+
+            form.priority,
+
+            form.memo,
+
+            form.subjectId,
+
+            form.tagIds
+
         );
         renderTasks(tasks);
         taskInput.value = "";
@@ -240,6 +316,17 @@ function openEditModal(task) {
     editPriority.value = task.priority;
     editSubject.value =
         task.subjectId ?? "";
+    const checkboxes =
+        editTagInput.querySelectorAll("input");
+    editMemo.value = task.memo;
+
+    for(const checkbox of checkboxes) {
+
+        checkbox.checked =
+            task.tagIds.includes(
+                Number(checkbox.value)
+            );
+    }
 
     editTitle.focus();
     editTitle.select();
@@ -424,6 +511,9 @@ function createContent(task) {
     const title = document.createElement("div");
     const titleRow = document.createElement("div");
 
+    const content = document.createElement("div");
+    content.classList.add("task-content");
+
     title.classList.add("task-title");
     title.textContent = task.title;
     titleRow.classList.add("task-title-row");
@@ -431,13 +521,30 @@ function createContent(task) {
     titleRow.appendChild(title);
     titleRow.appendChild(labels);
 
-
-    const content = document.createElement("div");
-    content.classList.add("task-content");
     content.appendChild(titleRow);
     content.appendChild(due);
 
+    const memo = document.createElement("div");
+    memo.classList.add("task-memo");
+    memo.title = task.memo.trim();
+
+    if (task.memo.trim() !== "") {
+
+        memo.textContent = truncateText(task.memo.trim(), 30);
+
+        content.appendChild(memo);
+    }
+
     return content;
+}
+
+function truncateText(text, maxLength) {
+
+    if (text.length <= maxLength) {
+        return text;
+    }
+
+    return text.substring(0,maxLength) + "...";
 }
 
 function createTaskElement(task) {
@@ -458,7 +565,8 @@ loadTasks();
 renderTasks(tasks);
 loadSubjects(subjectInput);
 loadSubjects(editSubject);
-loadTags();
+loadTags(tagInput);
+loadTags(editTagInput);
 
 //クリックで入力欄のを追加
 addTaskButton.addEventListener("click", function () {
@@ -473,13 +581,15 @@ saveButton.addEventListener("click", function () {
     const task = tasks.find(task => task.id === editingTaskId);
 
     if (task) {
-        task.title = editTitle.value;
-        task.due = editDue.value;
-        task.priority = Number(editPriority.value);
-        task.subjectId =
-            editSubject.value === ""
-                ? null
-                : Number(editSubject.value);
+
+        const form = getEditFormData();
+
+        task.title = form.title;
+        task.due = form.due;
+        task.priority = form.priority;
+        task.memo = form.memo;
+        task.subjectId = form.subjectId;
+        task.tagIds = form.tagIds;
 
         saveTasks();
         renderTasks(tasks);

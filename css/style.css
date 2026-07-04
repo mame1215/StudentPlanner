@@ -105,9 +105,7 @@ button {
     box-shadow: 0 0 0 3px rgba(74,144,226,0.15);
 }
 
-#priorityInput,
-#editPriority,
-#subjectInput {
+select {
     padding: 10px 14px;
 
     border: 1px solid #ccc;
@@ -133,15 +131,14 @@ button {
     padding-right: 36px;
 }
 
-#priorityInput:focus,
-#editPriority:focus,
-#subjectInput:focus {
+select:focus {
     outline: none;
     border-color: #4a90e2;
     box-shadow: 0 0 0 3px rgba(74,144,226,0.15);
 }
 
-.text-input {
+.text-input,
+#modalContent input {
     padding: 10px 14px;
     font-size: 16px;
 
@@ -153,7 +150,8 @@ button {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.text-input:focus {
+.text-input:focus,
+#modalContent input:focus {
     outline: none;
     border-color: #4a90e2;
     box-shadow: 0 0 0 3px rgba(74,144,226,0.15);
@@ -222,6 +220,18 @@ button {
     display: flex;
     gap: 8px;
     align-items: center;
+}
+
+.task-memo {
+    margin-top: 6px;
+
+    color: #666;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+
+    word-break: break-word;
 }
 
 li button {
@@ -321,24 +331,7 @@ li input[type="checkbox"] {
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-#modalContent input {
-    width: 100%;
-    box-sizing: border-box;
-
-    padding: 10px 12px;
-    font-size: 16px;
-
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
-
-#modalContent input:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-}
-
-#modalContent label {
+#modalContent > label {
     font-size: 14px;
     font-weight: 600;
     color: #555;
@@ -448,4 +441,51 @@ li input[type="checkbox"] {
     color: white;
 
     white-space: nowrap;
+}
+
+#tagInput,
+#editTagInput {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+textarea {
+    width: 100%;
+
+    min-height: 90px;
+
+    padding: 12px;
+
+    font-size: 15px;
+
+    font-family: inherit;
+
+    resize: vertical;
+
+    border: 1px solid #ccc;
+    border-radius: 10px;
+
+    box-sizing: border-box;
+
+    transition: border-color .2s, box-shadow .2s;
+}
+
+textarea:focus {
+    outline: none;
+
+    border-color: #4a90e2;
+
+    box-shadow: 0 0 0 3px rgba(74,144,226,.15);
+}
+
+.tag-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-right: 12px;
+    margin-bottom: 8px;
+
+    cursor: pointer;
 }
