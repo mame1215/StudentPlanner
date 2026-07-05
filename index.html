@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager</title>
+    <title>Student Planner</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <h1>Task Manager</h1>
+    <h1>Student Planner</h1>
 
     <h2>今日のタスク</h2>
 
     <ul id="taskList"></ul>
 
     <div class="input-area">
+        <!--タスク名-->
         <input
             class="text-input"
             type="text"
@@ -23,8 +24,10 @@
             placeholder="タスク名を入力">
 
         <div class="input-area-row">
+            <!--期限-->
             <input class="text-input" type="datetime-local" id="dueInput">
 
+            <!--優先度-->
             <select id="priorityInput">
                 <option value="5">🔴 最優先</option>
                 <option value="4">🟠 高</option>
@@ -33,17 +36,61 @@
                 <option value="1">⚪ 最低</option>
             </select>
 
+            <!--教科-->
             <select id="subjectInput">
                 <option value="">教科なし</option>
             </select>
         </div>
 
+        <!--作業予定-->
+        <div class="plan-group">
+            <span class="section-title">作業予定</span>
+
+            <div class="plan-row">
+
+                <input
+                    class="text-input"
+                    type="datetime-local"
+                    id="planStartInput">
+
+                <span class="range-separator">～</span>
+
+                <input
+                    class="text-input"
+                    type="datetime-local"
+                    id="planEndInput">
+            </div>
+        </div>
+
+        <!--持ち物-->
+        <div class="item-group">
+            <span class="section-title">持ち物</span>
+
+            <div id="itemList" class="item-list"></div>
+
+            <div class="item-input-row">
+                <input
+                    id="itemInput",
+                    class="text-input"
+                    type="text"
+                    placeholder="持ち物を入力">
+
+                <button
+                    id="addItemButton"
+                    type="button">
+                    ＋追加
+                </button>
+            </div>
+        </div>
+
+        <!--タグ-->
         <div class="tag-group">
-            <span>タグ</span>
+            <span class="section-title">タグ</span>
 
             <div id="tagInput"></div>
         </div>
 
+        <!--メモ-->
         <textarea
             id="memoInput"
             placeholder="メモ（任意）"
@@ -65,20 +112,65 @@
             <label>期限</label>
             <input type="datetime-local" id="editDue">
 
-            <label>優先度</label>
-                <select id="editPriority">
-                    <option value="5">🔴 最優先</option>
-                    <option value="4">🟠 高</option>
-                    <option value="3" selected>🟡 中</option>
-                    <option value="2">🟢 低</option>
-                    <option value="1">⚪ 最低</option>
-                </select>
-            
-            <label>教科</label>
-            <select id="editSubject"></select>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>教科</label>
+                    <select id="editSubject"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>優先度</label>
+                    <select id="editPriority">
+                        <option value="5">🔴 最優先</option>
+                        <option value="4">🟠 高</option>
+                        <option value="3" selected>🟡 中</option>
+                        <option value="2">🟢 低</option>
+                        <option value="1">⚪ 最低</option>
+                    </select>
+                </div>
+            </div>
+
+            <!--作業予定-->
+            <div class="plan-group">
+                <span class="section-title">作業予定</span>
+
+                <div class="plan-row">
+
+                    <input
+                        class="text-input"
+                        type="datetime-local"
+                        id="editPlanStart">
+
+                    <span class="range-separator">～</span>
+
+                    <input
+                        class="text-input"
+                        type="datetime-local"
+                        id="editPlanEnd">
+
+                </div>
+            </div>
 
             <label>タグ</label>
             <div id="editTagInput"></div>
+
+            <label>持ち物</label>
+
+            <div id="editItemList" class="item-list"></div>
+
+            <div class="item-input-row">
+                <input
+                    id="editItemInput",
+                    class="text-input"
+                    type="text"
+                    placeholder="持ち物を入力">
+
+                <button
+                    id="editAddItemButton"
+                    type="button">
+                    ＋追加
+                </button>
+            </div>
 
             <label>メモ</label>
             <textarea id="editMemo"></textarea>

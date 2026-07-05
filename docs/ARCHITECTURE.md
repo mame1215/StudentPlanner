@@ -37,7 +37,7 @@ StudentPlanner/
 
 # データ構造
 
-## Todo
+## Todo（変更あり。開発引き継ぎとjsファイルを参照）
 
 ```javascript
 {
@@ -498,13 +498,13 @@ Todo完成
 
 Phase2
 
-イベント
+教科
 
 ↓
 
 Phase3
 
-カレンダー
+持ち物
 
 ↓
 
@@ -516,13 +516,13 @@ Phase4
 
 Phase5
 
-教科
+イベント
 
 ↓
 
 Phase6
 
-持ち物
+カレンダー
 
 ↓
 

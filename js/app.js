@@ -4,7 +4,7 @@ let tasks = [
         title: "数学",
 
         completed: false,
-        conpletedAt: null,
+        completedAt: null,
 
         due: "",
 
@@ -30,7 +30,11 @@ const subjects = [
         id: 1,
         name: "数学",
         color: "#4285F4",
-        items: []
+        defaultItems: [
+            "教科書",
+            "ノート",
+            "青チャート"
+        ]
     }
 ];
 
@@ -46,6 +50,12 @@ const priorityText = [
     "高",
     "最優先"
 ];
+
+let currentItems = [];
+
+let currentEditItems = [];
+
+let previousSubjectId = "";
 
 function loadSubjects(selectElement) {
 
@@ -99,6 +109,11 @@ const priorityInput = document.getElementById("priorityInput");
 const memoInput = document.getElementById("memoInput");
 const subjectInput = document.getElementById("subjectInput");
 const tagInput = document.getElementById("tagInput");
+const planStartInput = document.getElementById("planStartInput");
+const planEndInput = document.getElementById("planEndInput");
+const itemList = document.getElementById("itemList");
+const itemInput = document.getElementById("itemInput");
+const addItemButton = document.getElementById("addItemButton");
 
 const modal = document.getElementById("modal");
 const editTitle = document.getElementById("editTitle");
@@ -109,10 +124,13 @@ const cancelButton = document.getElementById("cancelButton");
 const editSubject = document.getElementById("editSubject");
 const editTagInput = document.getElementById("editTagInput");
 const editMemo = document.getElementById("editMemo");
+const editPlanStart = document.getElementById("editPlanStart");
+const editPlanEnd = document.getElementById("editPlanEnd");
+const editItemList = document.getElementById("editItemList");
+const editItemInput = document.getElementById("editItemInput");
+const editAddItemButton = document.getElementById("editAddItemButton");
 
-//タスクのリストを更新
-function renderTasks(taskArray) {
-
+function sortTasks(taskArray) {
     //期限順に並び替え
     const sortedTasks = [...taskArray];
     sortedTasks.sort(function (a, b) {
@@ -132,6 +150,14 @@ function renderTasks(taskArray) {
         return new Date(a.due) - new Date(b.due);
     });
 
+    return sortedTasks;
+}
+
+//タスクのリストを更新
+function renderTasks(taskArray) {
+
+    const sortedTasks = sortTasks(taskArray);
+
     taskList.innerHTML = "";
 
     for (const task of sortedTasks) {
@@ -142,31 +168,34 @@ function renderTasks(taskArray) {
 }
 
 //タスクに追加
-function addTask(taskName, deadline, priority,memo, subjectId, tagIds) {
+function addTask(form) {
+
+    const subject = subjects.find(
+        subject => subject.id === form.subjectId
+    );
 
     tasks.push({
-        id: tasks.length + 1,
-        title: taskName,
+        id: Date.now(),
+
+        title: form.title,
 
         completed: false,
+
         completedAt: null,
 
-        due: deadline,
+        due: form.due,
 
-        plan: {
-            start: "",
-            end: ""
-        },
+        plan: form.plan,
 
-        priority: priority,
+        priority: form.priority,
 
-        subjectId: subjectId,
+        subjectId: form.subjectId,
 
-        tagIds: tagIds,
+        tagIds: form.tagIds,
 
-        items: [],
+        items: [...form.items],
 
-        memo: memo
+        memo: form.memo
     });
 
     priorityInput.value = "3";
@@ -212,7 +241,7 @@ function getTaskFormData(){
             dueInput.value,
 
         priority:
-            getpriority(priorityInput),
+            getPriority(priorityInput),
 
         memo:
             memoInput.value.trim(),
@@ -221,7 +250,14 @@ function getTaskFormData(){
             getSelectedSubject(subjectInput),
 
         tagIds:
-            getSelectedTagIds(tagInput)
+            getSelectedTagIds(tagInput),
+
+        plan: {
+            start: planStartInput.value,
+            end: planEndInput.value
+        },
+
+        items: [...currentItems]
     };
 }
 
@@ -245,7 +281,14 @@ function getEditFormData(){
             getSelectedSubject(editSubject),
 
         tagIds:
-            getSelectedTagIds(editTagInput)
+            getSelectedTagIds(editTagInput),
+
+        plan: {
+            start: editPlanStart.value,
+            end: editPlanEnd.value
+        },
+
+        items: [...currentEditItems]
     };
 }
 
@@ -254,22 +297,8 @@ function submitTask() {
 
     const form = getTaskFormData();
     
-    if(newTask !== ""){
-        addTask(
-
-            form.title,
-
-            form.due,
-
-            form.priority,
-
-            form.memo,
-
-            form.subjectId,
-
-            form.tagIds
-
-        );
+    if(form.title !== ""){
+        addTask(form);
         renderTasks(tasks);
         taskInput.value = "";
         dueInput.value = "";
@@ -313,12 +342,21 @@ function openEditModal(task) {
 
     editTitle.value = task.title;
     editDue.value = task.due;
+    editPlanStart.value = task.plan.start;
+    editPlanEnd.value = task.plan.end;
     editPriority.value = task.priority;
     editSubject.value =
         task.subjectId ?? "";
+    
     const checkboxes =
         editTagInput.querySelectorAll("input");
     editMemo.value = task.memo;
+
+    currentEditItems = [...task.items];
+    renderItemList(
+        editItemList,
+        currentEditItems
+    );
 
     for(const checkbox of checkboxes) {
 
@@ -327,6 +365,8 @@ function openEditModal(task) {
                 Number(checkbox.value)
             );
     }
+
+    previousSubjectId = subjectInput.value;
 
     editTitle.focus();
     editTitle.select();
@@ -347,6 +387,8 @@ function closeEditModal() {
 function createLabel(text, classNames = [], backgroundColor = null) {
 
     const label = document.createElement("span");
+
+    label.classList.add("label");
 
     label.textContent = text;
 
@@ -495,6 +537,10 @@ function createCheckbox(task) {
     checkbox.checked = task.completed;
     checkbox.addEventListener("change", function () {
         task.completed = checkbox.checked;
+        task.completeAt =
+            checkbox.checked
+                ? Date.now()
+                : null;
         saveTasks();
         renderTasks(tasks);
     });
@@ -502,28 +548,7 @@ function createCheckbox(task) {
     return checkbox;
 }
 
-function createContent(task) {
-
-    const labels = createLabels(task);
-    
-    const due = createDue(task);
-
-    const title = document.createElement("div");
-    const titleRow = document.createElement("div");
-
-    const content = document.createElement("div");
-    content.classList.add("task-content");
-
-    title.classList.add("task-title");
-    title.textContent = task.title;
-    titleRow.classList.add("task-title-row");
-
-    titleRow.appendChild(title);
-    titleRow.appendChild(labels);
-
-    content.appendChild(titleRow);
-    content.appendChild(due);
-
+function createMemo(container, task) {
     const memo = document.createElement("div");
     memo.classList.add("task-memo");
     memo.title = task.memo.trim();
@@ -532,8 +557,87 @@ function createContent(task) {
 
         memo.textContent = truncateText(task.memo.trim(), 30);
 
-        content.appendChild(memo);
+        container.appendChild(memo);
     }
+}
+
+function createTitle(labels, task) {
+    const title = document.createElement("div");
+    const titleRow = document.createElement("div");
+
+    title.classList.add("task-title");
+    title.textContent = task.title;
+    titleRow.classList.add("task-title-row");
+
+    titleRow.appendChild(title);
+    titleRow.appendChild(labels);
+
+    return {
+        title: title,
+        titleRow: titleRow
+    };
+}
+
+function createPlan(task) {
+    const plan = document.createElement("div");
+    plan.classList.add("task-plan");
+
+    if(!task.plan.start && !task.plan.end) {
+        return plan;
+    }
+
+    let text = "🕑️ ";
+
+    if (task.plan.start) {
+        const start = new Date(task.plan.start);
+
+        text +=
+            start.getMonth() + 1
+            + "/"
+            + start.getDate()
+            + " ";
+
+        text +=
+            String(start.getHours()).padStart(2, "0")
+            + ":"
+            + String(start.getMinutes()).padStart(2, "0");
+    }
+
+    if (task.plan.end) {
+        const end = new Date(task.plan.end);
+
+        text +=
+            " ～ "
+            + String(end.getHours()).padStart(2, "0")
+            + ":"
+            + String(end.getMinutes()).padStart(2, "0");
+    }
+
+    plan.textContent = text;
+
+    return plan;
+}
+
+function createContent(task) {
+
+    const labels = createLabels(task);
+    
+    const due = createDue(task);
+
+    const plan = createPlan(task);
+
+    const titles = createTitle(labels, task)
+    const title = titles.title;
+    const titleRow = titles.titleRow;
+
+    const content = document.createElement("div");
+    content.classList.add("task-content");
+
+    content.appendChild(titleRow);
+    content.appendChild(due);
+    content.appendChild(plan);
+
+    createMemo(content, task);
 
     return content;
 }
@@ -561,12 +665,103 @@ function createTaskElement(task) {
     return li;
 }
 
+function renderItemList(itemListElement, items) {
+
+    itemListElement.innerHTML = "";
+
+    items.forEach((item, index) => {
+        
+        const row = document.createElement("div");
+        row.classList.add("item-row");
+
+        const name = document.createElement("span");
+        name.textContent = item;
+
+        const remove = document.createElement("button");
+        remove.classList.add("item-remove");
+        remove.type = "button";
+        remove.textContent = "✕";
+
+        remove.addEventListener("click", () => {
+
+            items.splice(index,1);
+
+            renderItemList(itemListElement, items);
+        });
+
+        row.appendChild(name);
+        row.appendChild(remove);
+
+        itemListElement.appendChild(row);
+    })
+}
+
+function addItem(inputElement, items, itemListElement) {
+
+    const value = inputElement.value.trim();
+
+    if (!value) {
+
+        return;
+
+    }
+
+    items.push(value);
+
+    inputElement.value = "";
+
+    renderItemList(itemListElement, items);
+
+}
+
 loadTasks();
 renderTasks(tasks);
 loadSubjects(subjectInput);
 loadSubjects(editSubject);
 loadTags(tagInput);
 loadTags(editTagInput);
+
+subjectInput.addEventListener("change", () => {
+
+    const subject = subjects.find(
+        subject => subject.id === Number(subjectInput.value)
+    );
+
+    if (!subject) {
+
+        previousSubjectId = "";
+
+        currentItems = [];
+
+        renderItemList(itemList, currentItems);
+
+        return;
+
+    }
+
+    if (currentItems.length > 0) {
+
+        const result = confirm(
+            "教科を変更すると現在の持ち物は初期化されます。\nよろしいですか？"
+        );
+
+        if (!result) {
+
+            subjectInput.value = previousSubjectId;
+
+            return;
+
+        }
+
+    }
+
+    currentItems = [...subject.defaultItems];
+
+    renderItemList(itemList, currentItems);
+
+    previousSubjectId = subjectInput.value;
+
+});
 
 //クリックで入力欄のを追加
 addTaskButton.addEventListener("click", function () {
@@ -586,10 +781,12 @@ saveButton.addEventListener("click", function () {
 
         task.title = form.title;
         task.due = form.due;
+        task.plan = form.plan;
         task.priority = form.priority;
         task.memo = form.memo;
         task.subjectId = form.subjectId;
         task.tagIds = form.tagIds;
+        task.items = [...form.items];
 
         saveTasks();
         renderTasks(tasks);
@@ -627,5 +824,25 @@ taskInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
         submitTask();
     }
+
+});
+
+addItemButton.addEventListener("click", () => {
+
+    addItem(
+        itemInput,
+        currentItems,
+        itemList
+    );
+
+});
+
+editAddItemButton.addEventListener("click", () => {
+
+    addItem(
+        editItemInput,
+        currentEditItems,
+        editItemList
+    );
 
 });
