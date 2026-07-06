@@ -1,576 +1,326 @@
-# Student Planner 技術設計書
+# ARCHITECTURE
 
-## ディレクトリ構成（予定）
+## 概要
 
-```
-StudentPlanner/
+Student Planner は JavaScript・HTML・CSS のみで構成する。
 
-│ index.html
-│ style.css
-│ app.js
+設計方針
 
-├─css/
-│    modal.css
-│    calendar.css
-│    timetable.css
-
-├─js/
-│
-├── main.js
-├── storage.js
-├── ui.js
-│
-├── todo.js
-├── event.js
-├── timetable.js
-├── subject.js
-├── item.js
-├── settings.js
-│
-└── utils.js
-
-```
-
-※最初は app.js だけで実装し、機能が増えたら分割する。
+- 可読性を重視する
+- 関数は責務を小さくする
+- 共通化できる処理は共通化する
+- 将来の機能追加を考慮して設計する
+- リファクタリングしやすい構成を維持する
 
 ---
 
 # データ構造
 
-## Todo（変更あり。開発引き継ぎとjsファイルを参照）
+## Task
 
-```javascript
+```js
 {
     id,
     title,
 
-    deadline,
+    completed,
+    completedAt,
 
-    start,
+    due,
 
-    end,
+    plan: {
+        start,
+        end
+    },
 
     priority,
 
-    subject,
+    subjectId,
 
-    tags: [],
+    tagIds: [],
 
     items: [],
 
-    memo,
-
-    completed,
-
-    completedAt
+    memo
 }
 ```
+
+### completed
+
+完了状態
+
+### completedAt
+
+完了日時
+
+### due
+
+締切
+
+### plan
+
+作業予定
+
+### items
+
+このTodo固有の持ち物
 
 ---
 
 ## Event
 
-```javascript
+```js
 {
     id,
-
     title,
 
     start,
-
     end,
 
-    subject,
+    subjectId,
 
-    tags: [],
+    tagIds: [],
 
     items: [],
 
-    place,
-
-    memo,
-
-    repeat
+    memo
 }
 ```
+
+### start
+
+開始日時
+
+### end
+
+終了日時
+
+### items
+
+このイベント固有の持ち物
 
 ---
 
 ## Subject
 
-```javascript
+```js
 {
     id,
-
     name,
+    color,
 
-    defaultItems:[]
+    defaultItems: []
 }
 ```
 
+defaultItems は教科の規定持ち物。
+
+Todo・Eventで教科を選択した際の初期値として利用する。
+
 ---
 
-## Item
+## Tag
 
-```javascript
+```js
 {
     id,
-
-    name
+    name,
+    color
 }
 ```
 
 ---
 
-## Timetable
+# ファイル構成（最終予定）
 
-```javascript
-{
-    monday: [],
-
-    tuesday: [],
-
-    wednesday: [],
-
-    thursday: [],
-
-    friday: []
-}
 ```
+index.html
+style.css
 
-例
+js/
+    app.js
 
-```javascript
-monday:[
-    subjectId1,
-    subjectId3,
-    subjectId5
-]
+    todo.js
+    event.js
+
+    common.js
+
+    storage.js
+
+    tabs.js
+
+    settings.js
 ```
 
 ---
 
-## Settings
+## app.js
 
-```javascript
-{
-    todoDays,
+役割
 
-    theme,
+- 初期化
+- 各モジュールの起動
 
-    language
-}
-```
-
----
-
-# LocalStorage
-
-当面は一つずつ保存する。
-
-```
-todos
-
-events
-
-subjects
-
-items
-
-timetable
-
-settings
-```
-
----
-
-# モジュールの役割
-
-## storage.js
-
-保存・読込のみ担当
-
-```
-saveTodos()
-
-loadTodos()
-
-saveEvents()
-
-loadEvents()
-
-・・・
-```
+ビジネスロジックは持たない。
 
 ---
 
 ## todo.js
 
-Todo専用
+Todo機能
 
-```
-addTodo()
+担当
 
-deleteTodo()
+- 追加
+- 編集
+- 削除
+- 完了
+- 表示
+- 持ち物
+- 作業予定
 
-updateTodo()
+追加は入力フォーム
 
-sortTodos()
-
-renderTodos()
-
-completeTodo()
-```
+編集はモーダル
 
 ---
 
 ## event.js
 
-```
-addEvent()
+イベント機能
 
-deleteEvent()
+担当
 
-updateEvent()
+- 追加
+- 編集
+- 削除
+- 表示
+- 持ち物
 
-renderCalendar()
-```
+Todo とほぼ同じ構造で実装する。
 
----
+追加は入力フォーム
 
-## timetable.js
-
-```
-loadTimetable()
-
-saveTimetable()
-
-renderTimetable()
-```
+編集はモーダル
 
 ---
 
-## item.js
+## common.js
 
-```
-addItem()
-
-deleteItem()
-
-renderItems()
-```
-
----
-
-## subject.js
-
-```
-addSubject()
-
-renderSubjects()
-```
-
----
-
-## ui.js
-
-画面制御のみ担当
-
-```
-openModal()
-
-closeModal()
-
-showToast()
-
-scrollToSection()
-```
-
----
-
-## utils.js
-
-共通関数
-
-```
-formatDate()
-
-compareDate()
-
-generateId()
-
-sortByPriority()
-
-sortByDeadline()
-```
-
----
-
-# 描画方針
-
-データ変更
-
-↓
-
-LocalStorage保存
-
-↓
-
-render()
-
-の流れを統一する。
+共通処理
 
 例
 
-```
-Todo追加
+- createLabel()
+- renderItemList()
+- addItem()
+- truncateText()
+- loadSubjects()
+- loadTags()
 
-↓
-
-todos.push()
-
-↓
-
-saveTodos()
-
-↓
-
-renderTodos()
-```
+など
 
 ---
 
-# ソートルール
+## storage.js
 
-Todo
+localStorage管理
 
-1. 期限
-
-2. 優先度
-
-3. タイトル
+保存・読込のみ担当する予定。
 
 ---
 
-Event
+## tabs.js
 
-開始日時
-
----
-
-予定一覧
-
-開始時刻順
-
-Todoは期限時刻として扱う。
+タブ切り替え
 
 ---
 
-# ID
-
-UUIDは使わず
-
-```
-Date.now()
-```
-
-または
-
-```
-現在最大ID+1
-```
-
-を使用する。
-
-将来的に変更可能。
-
----
-
-# CSS方針
-
-できるだけ
-
-```
-id
-```
-
-ではなく
-
-```
-class
-```
-
-で共通化する。
-
-例
-
-```
-.text-input
-
-.primary-button
-
-.secondary-button
-
-.card
-
-.section-title
-
-.modal
-
-.modal-content
-```
-
----
-
-# 命名規則
-
-JavaScript
-
-```
-camelCase
-```
-
-```
-renderTodo()
-
-saveSettings()
-
-addEvent()
-```
-
-CSS
-
-```
-kebab-case
-```
-
-```
-task-card
-
-todo-item
-
-primary-button
-```
-
----
-
-# 開発ルール
-
-機能追加するときは
-
-1. データ構造を決める
-
-↓
-
-2. LocalStorage対応
-
-↓
-
-3. UI作成
-
-↓
-
-4. 編集
-
-↓
-
-5. 削除
-
-↓
-
-6. ソート
-
-↓
-
-7. デザイン調整
-
-の順に実装する。
-
----
-
-# 実装ロードマップ
-
-Phase1
-
-Todo完成
-
-↓
-
-Phase2
-
-教科
-
-↓
-
-Phase3
-
-持ち物
-
-↓
-
-Phase4
-
-時間割
-
-↓
-
-Phase5
-
-イベント
-
-↓
-
-Phase6
-
-カレンダー
-
-↓
-
-Phase7
-
-持ち物自動生成
-
-↓
-
-Phase8
-
-繰り返し予定
-
-↓
-
-Phase9
-
-条件付き予定
-
-↓
-
-Phase10
+## settings.js
 
 設定画面
 
-↓
+担当予定
 
-Phase11
-
-リファクタリング
+- 教科
+- タグ
+- 時間割
+- 教科規定持ち物
 
 ---
 
-# 今後の課題
+# タブ構成
 
-・Googleカレンダー連携
+## Home
 
-・通知
+ダッシュボード。
 
-・PWA対応
+編集は行わない。
 
-・ダークモード
+表示内容
 
-・CSV入出力
+- 今日の持ち物
+- 今日期限のTodo
+- 今日作業予定のTodo
+- 今日のイベント
+- 今日の時間割
+- Todo・Eventを統合したカレンダー
 
-・統計表示
+---
 
-・バックアップ機能
+## Todo
 
-```
-```
+Todo管理画面
+
+- 追加
+- 編集
+- 削除
+- 完了
+
+---
+
+## Event
+
+イベント管理画面
+
+- 追加
+- 編集
+- 削除
+
+---
+
+## Items
+
+持ち物一覧。
+
+表示専用。
+
+Todo
+
+Event
+
+Subject.defaultItems
+
+から集計して表示する。
+
+---
+
+## Settings
+
+設定画面
+
+- 教科
+- タグ
+- 時間割
+- 教科規定持ち物
+
+---
+
+# 設計ルール
+
+- 関数は責務を小さくする
+- 共通処理は common.js にまとめる
+- localStorage は将来 storage.js に分離する
+- Todo と Event はできるだけ同じ構造で実装する
+- UI・CSS のデザインを統一する
+- 機能追加後は必要に応じてリファクタリングを行う

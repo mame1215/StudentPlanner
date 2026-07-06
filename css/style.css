@@ -10,6 +10,82 @@ h1 {
     color: #333;
 }
 
+.tabs {
+
+    display: flex;
+
+    gap: 2px;
+
+    margin: 24px 0 0;
+
+    padding: 6px 6px 0;
+
+    background: #e9ecef;
+
+    border-radius: 12px 12px 0 0;
+
+}
+
+.tab-button {
+
+    flex: 1;
+
+    padding: 12px 16px;
+
+    border: none;
+
+    border-radius: 10px 10px 0 0;
+
+    background: transparent;
+
+    color: #666;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    transition: .2s;
+
+}
+
+.tab-button:hover {
+
+    background: rgba(255,255,255,.45);
+
+    color: #333;
+
+}
+
+.tab-button.active {
+
+    background: white;
+
+    color: #2563eb;
+
+    box-shadow: 0 -2px 6px rgba(0,0,0,.06);
+
+}
+
+.page {
+
+    display: none;
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 0 0 12px 12px;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+
+}
+
+.page.active {
+
+    display: block;
+
+}
+
 ul {
     list-style: none;
     padding: 0;
@@ -55,7 +131,7 @@ button {
 
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 
-    margin-top: 16px;
+    margin-top: 0;
 }
 
 .input-area-row {
@@ -79,31 +155,6 @@ button {
 #editPriority,
 #editSubject {
     width: 100%;
-}
-
-#memoInput {
-    width: 100%;
-
-    margin-top: 10px;
-
-    padding: 10px 14px;
-
-    border: 1px solid #ccc;
-    border-radius: 10px;
-
-    box-sizing: border-box;
-
-    font-size: 16px;
-    font-family: inherit;
-
-    resize: vertical;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-#memoInput:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 3px rgba(74,144,226,0.15);
 }
 
 select {
@@ -555,6 +606,41 @@ textarea:focus {
 
 }
 
+.item-add-button {
+
+    padding: 10px 16px;
+
+    border: 1px solid #ccc;
+    border-radius: 10px;
+
+    background: white;
+    color: #333;
+
+    font-size: 15px;
+
+    transition: 
+        background-color 0.2s,
+        border-color 0.2s,
+        transform 0.1s;
+
+    white-space: nowrap;
+
+}
+
+.item-add-button:hover {
+
+    background: #f5f5f5;
+
+    border-color: #bbb;
+
+}
+
+.item-add-button:active {
+
+    transform: scale(0.97);
+
+}
+
 .form-row {
 
     display: flex;
@@ -590,4 +676,104 @@ textarea:focus {
     font-weight: bold;
 
     color: #333;
+}
+
+#confirmModal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 2000;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background: rgba(0,0,0,.4);
+
+}
+
+#confirmModal.hidden {
+
+    display: none;
+
+}
+
+#confirmContent {
+
+    background: white;
+
+    width: 440px;
+
+    max-width: 90vw;
+
+    border-radius: 12px;
+
+    padding: 24px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+    box-shadow: 0 12px 32px rgba(0,0,0,.25);
+
+}
+
+#confirmTitle {
+
+    margin: 0;
+
+    font-size: 20px;
+
+}
+
+#confirmMessage {
+
+    margin: 0;
+
+    line-height: 1.6;
+
+    white-space: pre-line;
+
+}
+
+#addEventButton {
+
+    padding: 10px 18px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #4a90e2;
+
+    color: white;
+
+    font-size: 16px;
+
+    transition: background-color .2s, transform .1s;
+
+    white-space: nowrap;
+
+    margin-top: 12px;
+
+    width: 100%;
+
+}
+
+#addEventButton:hover {
+
+    background: #3b7dd8;
+
+}
+
+#addEventButton:active {
+
+    transform: scale(.97);
+
 }

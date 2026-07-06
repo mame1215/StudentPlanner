@@ -11,105 +11,268 @@
 <body>
     <h1>Student Planner</h1>
 
-    <h2>今日のタスク</h2>
+    <nav class="tabs">
 
-    <ul id="taskList"></ul>
-
-    <div class="input-area">
-        <!--タスク名-->
-        <input
-            class="text-input"
-            type="text"
-            id="taskInput"
-            placeholder="タスク名を入力">
-
-        <div class="input-area-row">
-            <!--期限-->
-            <input class="text-input" type="datetime-local" id="dueInput">
-
-            <!--優先度-->
-            <select id="priorityInput">
-                <option value="5">🔴 最優先</option>
-                <option value="4">🟠 高</option>
-                <option value="3" selected>🟡 中</option>
-                <option value="2">🟢 低</option>
-                <option value="1">⚪ 最低</option>
-            </select>
-
-            <!--教科-->
-            <select id="subjectInput">
-                <option value="">教科なし</option>
-            </select>
-        </div>
-
-        <!--作業予定-->
-        <div class="plan-group">
-            <span class="section-title">作業予定</span>
-
-            <div class="plan-row">
-
-                <input
-                    class="text-input"
-                    type="datetime-local"
-                    id="planStartInput">
-
-                <span class="range-separator">～</span>
-
-                <input
-                    class="text-input"
-                    type="datetime-local"
-                    id="planEndInput">
-            </div>
-        </div>
-
-        <!--持ち物-->
-        <div class="item-group">
-            <span class="section-title">持ち物</span>
-
-            <div id="itemList" class="item-list"></div>
-
-            <div class="item-input-row">
-                <input
-                    id="itemInput",
-                    class="text-input"
-                    type="text"
-                    placeholder="持ち物を入力">
-
-                <button
-                    id="addItemButton"
-                    type="button">
-                    ＋追加
-                </button>
-            </div>
-        </div>
-
-        <!--タグ-->
-        <div class="tag-group">
-            <span class="section-title">タグ</span>
-
-            <div id="tagInput"></div>
-        </div>
-
-        <!--メモ-->
-        <textarea
-            id="memoInput"
-            placeholder="メモ（任意）"
-            rows="3"></textarea>
-
-        <button id="addTaskButton">
-            + タスク追加
+        <button
+            class="tab-button active"
+            data-tab="todo">
+            📝 Todo
         </button>
-    </div>
+
+        <button
+            class="tab-button"
+            data-tab="event">
+            📅 イベント
+        </button>
+
+        <button
+            class="tab-button"
+            data-tab="item">
+            🎒 持ち物
+        </button>
+
+        <button
+            class="tab-button"
+            data-tab="settings">
+            ⚙️ 設定
+        </button>
+
+    </nav>
+
+    <section
+        id="todoPage"
+        class="page active">
+
+        <h2>今日のタスク</h2>
+
+        <ul id="taskList"></ul>
+
+        <div class="input-area">
+            <!--タスク名-->
+            <input
+                class="text-input"
+                type="text"
+                id="taskInput"
+                placeholder="タスク名を入力">
+
+            <div class="input-area-row">
+                <!--期限-->
+                <input class="text-input" type="datetime-local" id="dueInput">
+
+                <!--優先度-->
+                <select id="priorityInput">
+                    <option value="5">🔴 最優先</option>
+                    <option value="4">🟠 高</option>
+                    <option value="3" selected>🟡 中</option>
+                    <option value="2">🟢 低</option>
+                    <option value="1">⚪ 最低</option>
+                </select>
+
+                <!--教科-->
+                <select id="subjectInput">
+                    <option value="">教科なし</option>
+                </select>
+            </div>
+
+            <!--作業予定-->
+            <div class="plan-group">
+                <span class="section-title">作業予定</span>
+
+                <div class="plan-row">
+
+                    <input
+                        class="text-input"
+                        type="datetime-local"
+                        id="planStartInput">
+
+                    <span class="range-separator">～</span>
+
+                    <input
+                        class="text-input"
+                        type="datetime-local"
+                        id="planEndInput">
+                </div>
+            </div>
+
+            <!--持ち物-->
+            <div class="item-group">
+                <span class="section-title">持ち物</span>
+
+                <div id="itemList" class="item-list"></div>
+
+                <div class="item-input-row">
+                    <input
+                        id="itemInput"
+                        class="text-input"
+                        type="text"
+                        placeholder="持ち物を入力">
+
+                    <button
+                        class="item-add-button"
+                        id="addItemButton"
+                        type="button">
+                        ＋追加
+                    </button>
+                </div>
+            </div>
+
+            <!--タグ-->
+            <div class="tag-group">
+                <span class="section-title">タグ</span>
+
+                <div id="tagInput"></div>
+            </div>
+
+            <!--メモ-->
+            <textarea
+                id="memoInput"
+                class="large-textarea"
+                placeholder="メモ（任意）"
+                rows="3"></textarea>
+
+            <button id="addTaskButton">
+                + タスク追加
+            </button>
+        </div>
+    
+    </section>
+
+    <section
+        id="eventPage"
+        class="page">
+
+        <h2>イベント</h2>
+
+        <div class="input-area">
+
+            <input
+                id="eventTitleInput"
+                class="text-input"
+                type="text"
+                placeholder="イベント名"
+            >
+
+            <div class="plan-group">
+
+                <span class="section-title">
+                    日時
+                </span>
+
+                <div class="plan-row">
+
+                    <input
+                        id="eventStartInput"
+                        type="datetime-local"
+                    >
+
+                    <span class="range-separator">
+                        ～
+                    </span>
+
+                    <input
+                        id="eventEndInput"
+                        type="datetime-local"
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="input-area-row">
+
+                <select id="eventSubjectInput"></select>
+
+            </div>
+
+            <div class="tag-group">
+
+                <span class="section-title">
+                    タグ
+                </span>
+
+                <div id="eventTagInput"></div>
+
+            </div>
+
+            <div class="item-group">
+
+                <span class="section-title">
+                    持ち物
+                </span>
+
+                <div
+                    id="eventItemList"
+                    class="item-list">
+                </div>
+
+                <div class="item-input-row">
+
+                    <input
+                        id="eventItemInput"
+                        class="text-input"
+                        type="text"
+                        placeholder="持ち物を追加"
+                    >
+
+                    <button
+                        id="eventAddItemButton"
+                        type="button"
+                        class="small-add-button"
+                    >
+                        ＋
+                    </button>
+
+                </div>
+
+            </div>
+
+            <textarea
+                id="eventMemoInput"
+                placeholder="メモ"
+            ></textarea>
+
+            <button id="addEventButton">
+
+                イベントを追加
+
+            </button>
+
+        </div>
+        </div>
+
+        <ul id="eventList"></ul>
+
+    </section>
+
+    <section
+        id="itemPage"
+        class="page">
+
+        <h2>持ち物</h2>
+
+        <p>準備中</p>
+
+    </section>
+
+    <section
+        id="settingsPage"
+        class="page">
+
+        <h2>設定</h2>
+
+        <p>準備中</p>
+
+    </section>
 
     <div id="modal" class="hidden">
         <div id="modalContent">
 
             <h2>タスクを編集</h2>
 
-            <label>タイトル</label>
+            <label for="editTitle">タイトル</label>
             <input type="text" id="editTitle">
 
-            <label>期限</label>
+            <label for="editDue">期限</label>
             <input type="datetime-local" id="editDue">
 
             <div class="form-row">
@@ -151,29 +314,30 @@
                 </div>
             </div>
 
-            <label>タグ</label>
+            <label for="editTagInput">タグ</label>
             <div id="editTagInput"></div>
 
-            <label>持ち物</label>
+            <label for="editItemInput">持ち物</label>
 
             <div id="editItemList" class="item-list"></div>
 
             <div class="item-input-row">
                 <input
-                    id="editItemInput",
+                    id="editItemInput"
                     class="text-input"
                     type="text"
                     placeholder="持ち物を入力">
 
                 <button
+                    class="item-add-button"
                     id="editAddItemButton"
                     type="button">
                     ＋追加
                 </button>
             </div>
 
-            <label>メモ</label>
-            <textarea id="editMemo"></textarea>
+            <label id="editMemo">メモ</label>
+            <textarea id="editMemo" class="large-textarea"></textarea>
             <div class="modal-buttons">
                 <button id="cancelButton" class="secondary-button">
                     キャンセル
@@ -186,6 +350,45 @@
         </div>
     </div>
 
+    <div id="confirmModal" class="hidden">
+
+        <div id="confirmContent">
+
+            <h2 id="confirmTitle">
+                確認
+            </h2>
+
+            <p id="confirmMessage"></p>
+
+            <div class="modal-buttons">
+
+                <button
+                    id="confirmCancel"
+                    class="secondary-button"
+                    type="button">
+
+                    キャンセル
+
+                </button>
+
+                <button
+                    id="confirmOk"
+                    class="primary-button"
+                    type="button">
+
+                    OK
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/todo.js"></script>
+    <script src="js/event.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
