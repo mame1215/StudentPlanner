@@ -149,7 +149,7 @@
                 id="eventTitleInput"
                 class="text-input"
                 type="text"
-                placeholder="イベント名"
+                placeholder="イベント名を入力"
             >
 
             <div class="plan-group">
@@ -162,6 +162,7 @@
 
                     <input
                         id="eventStartInput"
+                        class="text-input"
                         type="datetime-local"
                     >
 
@@ -171,6 +172,7 @@
 
                     <input
                         id="eventEndInput"
+                        class="text-input"
                         type="datetime-local"
                     >
 
@@ -217,9 +219,9 @@
                     <button
                         id="eventAddItemButton"
                         type="button"
-                        class="small-add-button"
+                        class="item-add-button"
                     >
-                        ＋
+                        ＋追加
                     </button>
 
                 </div>
@@ -237,7 +239,6 @@
 
             </button>
 
-        </div>
         </div>
 
         <ul id="eventList"></ul>
@@ -258,9 +259,94 @@
         id="settingsPage"
         class="page">
 
-        <h2>設定</h2>
 
-        <p>準備中</p>
+
+        <h2>教科</h2>
+
+        <div class="input-area">
+
+            <input
+                id="subjectNameInput"
+                class="text-input"
+                type="text"
+                placeholder="教科名">
+
+            <input
+                id="subjectColorInput"
+                type="color"
+                value="#4285F4">
+
+            <div class="item-group">
+
+                <span class="section-title">
+
+                    既定持ち物
+
+                </span>
+
+                <div
+                    id="subjectDefaultItemList"
+                    class="item-list">
+                </div>
+
+                <div class="item-input-row">
+
+                    <input
+                        id="subjectDefaultItemInput"
+                        class="text-input"
+                        type="text"
+                        placeholder="持ち物を入力">
+
+                    <button
+                        id="addSubjectDefaultItemButton"
+                        class="item-add-button"
+                        type="button">
+
+                        ＋追加
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <button
+                id="addSubjectButton">
+
+                ＋教科を追加
+
+            </button>
+
+        </div>
+
+        <ul id="subjectList"></ul>
+
+
+        <h2>タグ</h2>
+
+        <div class="input-area">
+
+            <input
+                id="tagNameInput"
+                class="text-input"
+                type="text"
+                placeholder="タグ名">
+
+            <input
+                id="tagColorInput"
+                type="color"
+                value="#ef5350">
+
+            <button
+                id="addTagButton">
+
+                ＋タグを追加
+
+            </button>
+
+        </div>
+
+        <ul id="tagList"></ul>
 
     </section>
 
@@ -314,10 +400,10 @@
                 </div>
             </div>
 
-            <label for="editTagInput">タグ</label>
+            <span class="section-title">タグ</span>
             <div id="editTagInput"></div>
 
-            <label for="editItemInput">持ち物</label>
+            <span class="section-title">持ち物</span>
 
             <div id="editItemList" class="item-list"></div>
 
@@ -336,7 +422,7 @@
                 </button>
             </div>
 
-            <label id="editMemo">メモ</label>
+            <label for="editMemo">メモ</label>
             <textarea id="editMemo" class="large-textarea"></textarea>
             <div class="modal-buttons">
                 <button id="cancelButton" class="secondary-button">
@@ -348,6 +434,221 @@
             </div>
             
         </div>
+    </div>
+
+    <div id="eventModal" class="hidden">
+
+        <div id="eventModalContent">
+
+            <h2>イベントを編集</h2>
+
+            <label for="editEventTitle">タイトル</label>
+            <input
+                type="text"
+                id="editEventTitle">
+
+            <label for="editEventStart">開始日時</label>
+            <input
+                class="text-input"
+                type="datetime-local"
+                id="editEventStart">
+
+            <label for="editEventEnd">終了日時</label>
+            <input
+                class="text-input"
+                type="datetime-local"
+                id="editEventEnd">
+
+            <label>教科</label>
+            <select id="editEventSubject"></select>
+
+            <label>タグ</label>
+            <div id="editEventTagInput"></div>
+
+            <label>持ち物</label>
+
+            <div
+                id="editEventItemList"
+                class="item-list">
+            </div>
+
+            <div class="item-input-row">
+
+                <input
+                    id="editEventItemInput"
+                    class="text-input"
+                    type="text"
+                    placeholder="持ち物を入力">
+
+                <button
+                    id="editEventAddItemButton"
+                    class="item-add-button"
+                    type="button">
+
+                    ＋追加
+
+                </button>
+
+            </div>
+
+            <label for="editEventMemo">
+                メモ
+            </label>
+
+            <textarea
+                id="editEventMemo">
+            </textarea>
+
+            <div class="modal-buttons">
+
+                <button
+                    id="cancelEventButton"
+                    class="secondary-button">
+
+                    キャンセル
+
+                </button>
+
+                <button
+                    id="saveEventButton"
+                    class="primary-button">
+
+                    保存
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="subjectModal" class="hidden">
+
+        <div id="subjectModalContent">
+
+            <h2>教科を編集</h2>
+
+            <label for="editSubjectName">
+                教科名
+            </label>
+
+            <input
+                id="editSubjectName"
+                class="text-input"
+                type="text">
+
+            <label for="editSubjectColor">
+                色
+            </label>
+
+            <input
+                id="editSubjectColor"
+                type="color">
+
+            <div class="item-group">
+
+                <span class="section-title">
+
+                    既定持ち物
+
+                </span>
+
+                <div
+                    id="editSubjectDefaultItemList"
+                    class="item-list">
+                </div>
+
+                <div class="item-input-row">
+
+                    <input
+                        id="editSubjectDefaultItemInput"
+                        class="text-input"
+                        type="text"
+                        placeholder="持ち物を入力">
+
+                    <button
+                        id="editSubjectDefaultItemButton"
+                        class="item-add-button"
+                        type="button">
+
+                        ＋追加
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="modal-buttons">
+
+                <button
+                    id="cancelSubjectButton"
+                    class="secondary-button">
+
+                    キャンセル
+
+                </button>
+
+                <button
+                    id="saveSubjectButton"
+                    class="primary-button">
+
+                    保存
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="tagModal" class="hidden">
+
+        <div id="tagModalContent">
+
+            <h2>タグを編集</h2>
+
+            <label for="editTagName">
+                タグ名
+            </label>
+
+            <input
+                id="editTagName"
+                class="text-input"
+                type="text">
+
+            <label for="editTagColor">
+                色
+            </label>
+
+            <input
+                id="editTagColor"
+                type="color">
+
+            <div class="modal-buttons">
+
+                <button
+                    id="cancelTagButton"
+                    class="secondary-button">
+
+                    キャンセル
+
+                </button>
+
+                <button
+                    id="saveTagButton"
+                    class="primary-button">
+
+                    保存
+
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
     <div id="confirmModal" class="hidden">
@@ -389,6 +690,7 @@
     <script src="js/data.js"></script>
     <script src="js/todo.js"></script>
     <script src="js/event.js"></script>
+    <script src="js/settings.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

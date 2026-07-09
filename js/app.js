@@ -1,4 +1,5 @@
 //初期化処理
+initializeSettings();
 initializeTodo();
 initializeEvent();
 

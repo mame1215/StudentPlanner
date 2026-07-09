@@ -341,9 +341,12 @@ function closeEditModal() {
 }
 
 //確認画面を開く
-function showConfirmDialog(message) {
+function showConfirmDialog(message, showCancel = true) {
 
     confirmMessage.textContent = message;
+
+    confirmCancel.style.display =
+        showCancel ? "" : "none";
 
     confirmModal.classList.remove("hidden");
 
@@ -352,6 +355,8 @@ function showConfirmDialog(message) {
         function close(result) {
 
             confirmModal.classList.add("hidden");
+
+            confirmCancel.style.display = "";
 
             confirmOk.removeEventListener(
                 "click",
@@ -896,10 +901,27 @@ modal.addEventListener("click", function (event) {
 //編集キャンセル（esc）
 document.addEventListener("keydown", function (event) {
     if (
-        event.key === "Escape" &&
-        !modal.classList.contains("hidden")
-    ){
-        closeEditModal();
+        event.key === "Escape"
+    ) {
+
+        if (!modal.classList.contains("hidden")) {
+
+            closeEditModal();
+
+        }
+
+        if (!eventModal.classList.contains("hidden")) {
+
+            closeEditEventModal();
+
+        }
+
+        if (!subjectModal.classList.contains("hidden")) {
+
+            closeEditSubjectModal();
+
+        }
+
     }
 });
 

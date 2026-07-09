@@ -1,3 +1,13 @@
+let eventItems = [];
+
+let previousEventSubjectId = "";
+
+let editEventItems = [];
+
+let previousEditEventSubjectId = "";
+
+let editingEventId = null;
+
 const eventList = document.getElementById("eventList");
 const openAddEventButton = document.getElementById("openAddEventButton");
 
@@ -31,6 +41,44 @@ const eventAddItemButton =
 const addEventButton =
     document.getElementById("addEventButton");
 
+
+
+const eventModal =
+    document.getElementById("eventModal");
+
+const editEventTitle =
+    document.getElementById("editEventTitle");
+
+const editEventStart =
+    document.getElementById("editEventStart");
+
+const editEventEnd =
+    document.getElementById("editEventEnd");
+
+const editEventSubject =
+    document.getElementById("editEventSubject");
+
+const editEventTagInput =
+    document.getElementById("editEventTagInput");
+
+const editEventMemo =
+    document.getElementById("editEventMemo");
+
+const editEventItemList =
+    document.getElementById("editEventItemList");
+
+const editEventItemInput =
+    document.getElementById("editEventItemInput");
+
+const editEventAddItemButton =
+    document.getElementById("editEventAddItemButton");
+
+const saveEventButton =
+    document.getElementById("saveEventButton");
+
+const cancelEventButton =
+    document.getElementById("cancelEventButton");
+
 function saveEvents() {
 
     localStorage.setItem(
@@ -50,6 +98,131 @@ function loadEvents() {
         events = JSON.parse(data);
 
     }
+
+}
+
+function getEventFormData() {
+
+    return {
+
+        title:
+            eventTitleInput.value.trim(),
+
+        start:
+            eventStartInput.value,
+
+        end:
+            eventEndInput.value,
+
+        allDay: false,
+
+        subjectId:
+            getSelectedSubject(eventSubjectInput),
+
+        tagIds:
+            getSelectedTagIds(eventTagInput),
+
+        items:
+            [...eventItems],
+
+        memo:
+            eventMemoInput.value.trim()
+
+    };
+
+}
+
+function getEditEventFormData() {
+
+    return {
+
+        title:
+            editEventTitle.value.trim(),
+
+        start:
+            editEventStart.value,
+
+        end:
+            editEventEnd.value,
+
+        allDay: false,
+
+        subjectId:
+            getSelectedSubject(editEventSubject),
+
+        tagIds:
+            getSelectedTagIds(editEventTagInput),
+
+        items:
+            [...editEventItems],
+
+        memo:
+            editEventMemo.value.trim()
+
+    };
+
+}
+
+function clearEventForm() {
+
+    eventTitleInput.value = "";
+
+    eventStartInput.value = "";
+
+    eventEndInput.value = "";
+
+    eventSubjectInput.value = "";
+
+    eventMemoInput.value = "";
+
+    eventItems.length = 0;
+
+    renderItemList(
+        eventItemList,
+        eventItems
+    );
+
+    const checkedTags =
+        eventTagInput.querySelectorAll("input:checked");
+
+    for (const checkbox of checkedTags) {
+
+        checkbox.checked = false;
+
+    }
+
+}
+
+async function submitEvent() {
+
+    const form = getEventFormData();
+
+    if (
+        form.start &&
+        form.end &&
+        new Date(form.start) > new Date(form.end)
+    ) {
+        
+        await showConfirmDialog(
+            "開始日時は終了日時以前にしてください。",
+            false
+        );
+
+        return;
+
+    }
+
+    if (form.title === "") {
+
+        return;
+
+    }
+
+    addEvent(form);
+
+    renderEvents(events);
+
+    clearEventForm();
 
 }
 
@@ -80,26 +253,23 @@ function addEvent(form) {
     saveEvents();
 }
 
-function updateEvent(id, form) {
-
-    const event = events.find(
-        event => event.id === id
-    );
-
-    if (!event) {
-        return;
-    }
+function updateEvent(event, form) {
 
     event.title = form.title;
-    event.start = form.start;
-    event.add = form.end;
-    event.allDay = form.allDay;
-    event.subjectId = form.subjectId;
-    event.tagIds = form.tagIds;
-    event.items = [...form.items];
-    event.memo = form.memo;
 
-    saveEvents();
+    event.start = form.start;
+
+    event.end = form.end;
+
+    event.allDay = form.allDay;
+
+    event.subjectId = form.subjectId;
+
+    event.tagIds = form.tagIds;
+
+    event.items = [...form.items];
+
+    event.memo = form.memo;
 
 }
 
@@ -113,11 +283,97 @@ function deleteEvent(id) {
 
 }
 
+function openEditEventModal(event) {
+
+    editingEventId = event.id;
+
+    editEventTitle.value = event.title;
+
+    editEventStart.value = event.start;
+
+    editEventEnd.value = event.end;
+
+    editEventSubject.value =
+        event.subjectId ?? "";
+
+    editEventMemo.value = event.memo;
+
+    editEventItems.length = 0;
+
+    editEventItems.push(...event.items);
+
+    renderItemList(
+        editEventItemList,
+        editEventItems
+    );
+
+    const checkboxes =
+        editEventTagInput.querySelectorAll("input");
+
+    for (const checkbox of checkboxes) {
+
+        checkbox.checked =
+            event.tagIds.includes(
+                Number(checkbox.value)
+            );
+
+    }
+
+    previousEditEventSubjectId =
+        editEventSubject.value;
+
+    editEventTitle.focus();
+
+    editEventTitle.select();
+
+    eventModal.classList.remove("hidden");
+
+}
+
+function closeEditEventModal() {
+
+    eventModal.classList.add("hidden");
+
+    editingEventId = null;
+
+    document.activeElement.blur();
+
+}
+
+function sortEvents(eventArray) {
+
+    const sortedEvents = [...eventArray];
+
+    sortedEvents.sort((a, b) => {
+
+        if (!a.start && !b.start) {
+            return 0;
+        }
+
+        if (!a.start) {
+            return 1;
+        }
+
+        if (!b.start) {
+            return -1;
+        }
+
+        return new Date(a.start) - new Date(b.start);
+
+    });
+
+    return sortedEvents;
+
+}
+
 function renderEvents(eventArray) {
+
+    const sortedEvents =
+        sortEvents(eventArray);
 
     eventList.innerHTML = "";
 
-    for (const event of eventArray) {
+    for (const event of sortedEvents) {
 
         eventList.appendChild(
             createEventElement(event)
@@ -207,9 +463,9 @@ function createEventContent(event) {
 
     const labels = createEventLabels(event);
 
-    const titles = createTitle(labels, event);
+    const title = createTitle(labels, event);
 
-    content.appendChild(titles.titleRow);
+    content.appendChild(title.titleRow);
 
     content.appendChild(
         createEventDate(event)
@@ -241,20 +497,165 @@ function createEventActions(event) {
 
     actions.appendChild(deleteButton);
 
+    deleteButton.addEventListener("click", () => {
+
+        deleteEvent(event.id);
+
+        renderEvents(events);
+    });
+
+    editButton.addEventListener("click", () => {
+
+        openEditEventModal(event);
+
+    });
+
     return actions;
 
 }
 
 
 
+eventAddItemButton.addEventListener("click", () => {
 
+    addItem(
+        eventItemInput,
+        eventItems,
+        eventItemList
+    );
+
+});
+
+eventSubjectInput.addEventListener("change", async () => {
+
+    await handleSubjectChange(
+
+        eventSubjectInput,
+
+        eventItems,
+
+        eventItemList,
+
+        previousEventSubjectId,
+
+        value => previousEventSubjectId = value
+
+    );
+
+});
+
+addEventButton.addEventListener("click", () => {
+
+    submitEvent();
+
+});
+
+eventTitleInput.addEventListener("keydown", async event => {
+
+    if (event.key === "Enter") {
+
+        await submitEvent();
+
+    }
+})
+
+saveEventButton.addEventListener("click", async () => {
+
+    const event = events.find(
+        event => event.id === editingEventId
+    );
+
+    if (!event) {
+
+        return;
+
+    }
+
+    const form = getEditEventFormData();
+
+    if (
+        form.start &&
+        form.end &&
+        new Date(form.start) > new Date(form.end)
+    ) {
+
+        await showConfirmDialog(
+            "開始日時は終了日時以前にしてください。",
+            false
+        );
+
+        return;
+    }
+
+    updateEvent(
+        event,
+        form
+    );
+
+    saveEvents();
+
+    renderEvents(events);
+
+    closeEditEventModal();
+
+});
+
+cancelEventButton.addEventListener("click", () => {
+
+    closeEditEventModal();
+
+});
+
+eventModal.addEventListener("click", event => {
+
+    if (event.target === eventModal) {
+
+        closeEditEventModal();
+
+    }
+
+});
+
+editEventAddItemButton.addEventListener("click", () => {
+
+    addItem(
+
+        editEventItemInput,
+
+        editEventItems,
+
+        editEventItemList
+
+    );
+
+});
+
+editEventSubject.addEventListener("change", async () => {
+
+    await handleSubjectChange(
+
+        editEventSubject,
+
+        editEventItems,
+
+        editEventItemList,
+
+        previousEditEventSubjectId,
+
+        value => previousEditEventSubjectId = value
+
+    );
+
+});
 
 function initializeEvent() {
     loadEvents();
 
     loadSubjects(eventSubjectInput);
+    loadSubjects(editEventSubject);
 
     loadTags(eventTagInput);
+    loadTags(editEventTagInput);
 
     renderEvents(events);
 }

@@ -190,7 +190,8 @@ select:focus {
 }
 
 .text-input,
-#modalContent input:not([type="checkbox"]) {
+#modalContent input:not([type="checkbox"]),
+#eventModalContent input:not([type="checkbox"]) {
     padding: 10px 14px;
     font-size: 16px;
 
@@ -203,7 +204,8 @@ select:focus {
 }
 
 .text-input:focus,
-#modalContent input:not([type="checkbox"]):focus {
+#modalContent input:not([type="checkbox"]):focus,
+#eventModalContent input:not([type="checkbox"]):focus {
     outline: none;
     border-color: #4a90e2;
     box-shadow: 0 0 0 3px rgba(74,144,226,0.15);
@@ -341,7 +343,10 @@ li input[type="checkbox"] {
     opacity: 0.6;
 }
 
-#modal {
+#subjectModal,
+#modal,
+#eventModal,
+#tagModal {
     position: fixed;
     inset: 0;
     z-index: 1000;
@@ -358,20 +363,32 @@ li input[type="checkbox"] {
     transition: opacity 0.2s, visibility 0.2s;
 }
 
-#modal.hidden {
+#modal.hidden,
+#eventModal.hidden,
+#subjectModal.hidden,
+#tagModal.hidden {
     opacity: 0;
     visibility: hidden;
 }
 
-#modal.hidden #modalContent {
+#modal.hidden #modalContent,
+#eventModal.hidden #eventModalContent,
+#subjectModal.hidden #subjectModalContent,
+#tagModal.hidden #tagModalContent {
     transform: translateY(10px) scale(0.95);
 }
 
-#modal:not(.hidden) #modalContent {
+#modal:not(.hidden) #modalContent,
+#eventModal:not(.hidden) #eventModalContent,
+#subjectModal:not(.hidden) #subjectModalContent,
+#tagModal:not(.hidden) #tagModalContent {
     transform: scale(1);
 }
 
-#modalContent {
+#modalContent,
+#eventModalContent,
+#subjectModalContent,
+#tagModalContent {
     background: white;
     width: 400px;
     max-width: 90vw;
@@ -393,7 +410,10 @@ li input[type="checkbox"] {
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-#modalContent > label {
+#modalContent > label,
+#eventModalContent > label,
+#subjectModalContent > label,
+#tagModalContent > label {
     font-size: 14px;
     font-weight: 600;
     color: #555;
@@ -476,6 +496,10 @@ li input[type="checkbox"] {
 .tag-group,
 .plan-group,
 .item-group {
+    margin-top: 16px;
+}
+
+#eventMemoInput {
     margin-top: 16px;
 }
 
@@ -775,5 +799,22 @@ textarea:focus {
 #addEventButton:active {
 
     transform: scale(.97);
+
+}
+
+#subjectColorInput,
+#tagColorInput {
+
+    width: 60px;
+
+    height: 46px;
+
+    padding: 4px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 10px;
+
+    background: white;
 
 }
