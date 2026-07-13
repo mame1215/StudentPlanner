@@ -4,7 +4,11 @@ let editingSubjectId = null;
 
 let subjectDefaultItems = [];
 
+let subjectTimetableItems = [];
+
 let editSubjectDefaultItems = [];
+
+let editSubjectTimetableItems = [];
 
 const subjectList =
     document.getElementById("subjectList");
@@ -31,6 +35,21 @@ const subjectDefaultItemInput =
 const addSubjectDefaultItemButton =
     document.getElementById(
         "addSubjectDefaultItemButton"
+    );
+
+const subjectTimetableItemList =
+    document.getElementById(
+        "subjectTimetableItemList"
+    );
+
+const subjectTimetableItemInput =
+    document.getElementById(
+        "subjectTimetableItemInput"
+    );
+
+const addSubjectTimetableItemButton =
+    document.getElementById(
+        "addSubjectTimetableItemButton"
     );
 
 
@@ -64,6 +83,21 @@ const editSubjectDefaultItemButton =
         "editSubjectDefaultItemButton"
     );
 
+const editSubjectTimetableItemList =
+    document.getElementById(
+        "editSubjectTimetableItemList"
+    );
+
+const editSubjectTimetableItemInput =
+    document.getElementById(
+        "editSubjectTimetableItemInput"
+    );
+
+const editSubjectTimetableAddItemButton =
+    document.getElementById(
+        "editSubjectTimetableAddItemButton"
+    );
+
 
 
 function getSubjectFormData() {
@@ -77,7 +111,10 @@ function getSubjectFormData() {
             subjectColorInput.value,
 
         defaultItems:
-            [...subjectDefaultItems]
+            [...subjectDefaultItems],
+
+        timetableItems:
+            [...subjectTimetableItems]
 
     };
 
@@ -94,7 +131,10 @@ function getEditSubjectFormData() {
             editSubjectColor.value,
 
         defaultItems:
-            [...editSubjectDefaultItems]
+            [...editSubjectDefaultItems],
+
+        timetableItems: 
+            [...editSubjectTimetableItems]
 
     };
 
@@ -111,7 +151,10 @@ function addSubject(form) {
         color: form.color,
 
         defaultItems:
-            [...form.defaultItems]
+            [...form.defaultItems],
+
+        timetableItems:
+            [...form.timetableItems]
 
     });
 
@@ -126,6 +169,8 @@ function updateSubject(subject, form) {
     subject.color = form.color;
 
     subject.defaultItems = [...form.defaultItems];
+
+    subject.timetableItems = [...form.timetableItems];
 
     saveSubjects();
 
@@ -166,6 +211,17 @@ function deleteSubject(id) {
 
     subjects.splice(index, 1);
 
+    for (const weekday of WEEKDAYS) {
+        timetable[weekday] =
+            timetable[weekday].map(period =>
+                period === id
+                    ? null
+                    : period
+            );
+    }
+
+    saveTimetable();
+
     saveSubjects();
 
     saveTasks();
@@ -179,6 +235,11 @@ function deleteSubject(id) {
     renderEvents(events);
 
     refreshSubjectInputs();
+
+    renderTimetable();
+
+    refreshItems();
+    refreshHome();
 
 }
 
@@ -197,6 +258,13 @@ function clearSubjectForm() {
         subjectDefaultItems
 
     )
+
+    subjectTimetableItems.length = 0;
+
+    renderItemList(
+        subjectTimetableItemList,
+        subjectTimetableItems
+    );
 
 }
 
@@ -228,6 +296,11 @@ function submitSubject() {
     renderSubjects();
 
     refreshSubjectInputs();
+
+    renderTimetable();
+
+    refreshItems();
+    refreshHome();
 
     clearSubjectForm();
 
@@ -371,6 +444,18 @@ function openEditSubjectModal(subject) {
 
     );
 
+    editSubjectTimetableItems.length = 0;
+
+    editSubjectTimetableItems.push(
+        ...(subject.timetableItems ?? [])
+    );
+
+    renderItemList(
+        editSubjectTimetableItemList,
+
+        editSubjectTimetableItems
+    );
+
     editSubjectName.focus();
 
     editSubjectName.select();
@@ -475,6 +560,11 @@ saveSubjectButton.addEventListener("click", () => {
 
     refreshSubjectInputs();
 
+    renderTimetable();
+
+    refreshItems();
+    refreshHome();
+
     closeEditSubjectModal();
 
 });
@@ -496,6 +586,20 @@ addSubjectDefaultItemButton.addEventListener(
     }
 );
 
+addSubjectTimetableItemButton.addEventListener("click", () => {
+
+    addItem(
+
+        subjectTimetableItemInput,
+
+        subjectTimetableItems,
+
+        subjectTimetableItemList
+
+    );
+
+});
+
 editSubjectDefaultItemButton.addEventListener(
     "click",
     () => {
@@ -512,6 +616,18 @@ editSubjectDefaultItemButton.addEventListener(
 
     }
 );
+
+editSubjectTimetableAddItemButton.addEventListener("click", () => {
+
+    addItem(
+
+        editSubjectTimetableItemInput,
+
+        editSubjectTimetableItems,
+
+        editSubjectTimetableItemList
+    )
+})
 
 //====================tag======================
 
@@ -929,6 +1045,10 @@ saveTagButton.addEventListener("click", () => {
 
 function initializeSettings() {
 
+    loadPeriodCounts();
+
+    loadTimetable();
+
     loadSubjectsData();
 
     renderSubjects();
@@ -943,5 +1063,398 @@ function initializeSettings() {
     renderTags();
 
     refreshTagInputs();
+
+    renderPeriodCountSettings();
+
+    renderTimetable();
+
+}
+
+//======================================================
+
+const periodCountSettings =
+    document.getElementById(
+        "periodCountSettings"
+    );
+
+const timetableContainer =
+    document.getElementById(
+        "timetableContainer"
+    );
+
+function saveTimetable() {
+
+    localStorage.setItem(
+        "timetable",
+
+        JSON.stringify(timetable)
+    );
+}
+
+function loadTimetable() {
+    const data = localStorage.getItem(
+        "timetable"
+    );
+
+    if (data === null) {
+        initializeTimetable();
+
+        return;
+    }
+
+    timetable = JSON.parse(data);
+}
+
+function savePeriodCounts() {
+    localStorage.setItem(
+        "periodCounts",
+        JSON.stringify(periodCounts)
+    );
+}
+
+function loadPeriodCounts() {
+    const data = localStorage.getItem(
+        "periodCounts"
+    );
+
+    if (data !== null) {
+        periodCounts = JSON.parse(data);
+    }
+}
+
+function renderPeriodCountSettings() {
+
+    periodCountSettings.innerHTML = "";
+
+    for (const weekday of WEEKDAYS) {
+
+        const row =
+            document.createElement("div");
+
+        row.classList.add(
+            "period-count-row"
+        );
+
+        const label =
+            document.createElement("label");
+
+        label.textContent =
+            WEEKDAY_NAMES[weekday];
+
+        const select =
+            document.createElement("select");
+
+        for (
+            let i = 1;
+            i <= 10;
+            i++
+        ) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = i;
+
+            option.textContent =
+                `${i}限`;
+
+            if (
+                i === periodCounts[weekday]
+            ) {
+
+                option.selected = true;
+
+            }
+
+            select.appendChild(option);
+
+        }
+
+        select.addEventListener("change", () => {
+
+            const oldLength =
+                timetable[weekday].length;
+
+            const newLength =
+                Number(select.value);
+
+            if (newLength > oldLength) {
+
+                while (
+
+                    timetable[weekday].length
+                    < newLength
+                 ) {
+                    timetable[weekday].push(null);
+                }
+            }
+
+            else {
+
+                timetable[weekday].length =
+                    newLength;
+                
+            }
+
+            periodCounts[weekday] =
+                newLength;
+
+            savePeriodCounts();
+
+            saveTimetable();
+
+            renderTimetable();
+        })
+
+        row.appendChild(label);
+
+        row.appendChild(select);
+
+        periodCountSettings.appendChild(
+            row
+        );
+
+    }
+
+}
+
+function renderTimetable() {
+
+    timetableContainer.innerHTML = "";
+
+    const table =
+        document.createElement("table");
+
+    table.classList.add(
+        "timetable"
+    );
+
+    const thead =
+        document.createElement("thead");
+
+    const headRow =
+        document.createElement("tr");
+
+    headRow.appendChild(
+        document.createElement("th")
+    );
+
+    for (const weekday of WEEKDAYS) {
+
+        const th =
+            document.createElement("th");
+
+        th.textContent =
+            WEEKDAY_NAMES[weekday];
+
+        headRow.appendChild(th);
+
+    }
+
+    thead.appendChild(headRow);
+
+    table.appendChild(thead);
+
+    const tbody =
+        document.createElement("tbody");
+
+    const maxPeriods =
+        Math.max(
+            ...Object.values(
+                periodCounts
+            )
+        );
+
+    for (
+        let period = 0;
+        period < maxPeriods;
+        period++
+    ) {
+
+        const tr =
+            document.createElement("tr");
+
+        const periodCell =
+            document.createElement("th");
+
+        periodCell.textContent =
+            `${period + 1}限`;
+
+        tr.appendChild(periodCell);
+
+        for (const weekday of WEEKDAYS) {
+
+            const td =
+                document.createElement("td");
+
+            if (
+                period <
+                periodCounts[weekday]
+            ) {
+
+                const select =
+                    document.createElement("select");
+
+                select.dataset.weekday =
+                    weekday;
+
+                select.dataset.period =
+                    period;
+
+                const none =
+                    document.createElement("option");
+
+                none.value = "";
+
+                none.textContent =
+                    "なし";
+
+                select.appendChild(none);
+
+                for (const subject of subjects) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value =
+                        subject.id;
+
+                    option.textContent =
+                        subject.name;
+
+                    select.appendChild(option);
+
+                }
+
+                select.value = timetable[weekday][period] ?? "";
+
+                select.addEventListener("change", () => {
+                    timetable[weekday][period] =
+                        select.value === ""
+                            ? null
+                            : Number(select.value);
+
+                    saveTimetable();
+                })
+
+                td.appendChild(select);
+
+            }
+
+            tr.appendChild(td);
+
+        }
+
+        tbody.appendChild(tr);
+
+    }
+
+    table.appendChild(tbody);
+
+    timetableContainer.appendChild(
+        table
+    );
+
+}
+
+function getWeekdayKey(date) {
+
+    const weekdays = [
+
+        "sunday",
+
+        "monday",
+
+        "tuesday",
+
+        "wednesday",
+
+        "thursday",
+
+        "friday",
+
+        "saturday"
+
+    ];
+
+    return weekdays[
+        date.getDay()
+    ];
+
+}
+
+function getSubjectsForDate(date) {
+
+    return getTimetableForDate(date)
+
+        .map(subjectId =>
+
+            subjects.find(
+
+                subject =>
+
+                    subject.id ===
+                    subjectId
+
+            ) ?? null
+
+        );
+
+}
+
+function getTimetableItemsForDate(date) {
+
+    const result = [];
+
+    const daySubjects =
+        getSubjectsForDate(
+            date
+        );
+
+    for (const subject of daySubjects) {
+
+        if (!subject){
+            continue;
+        }
+        result.push({
+
+            subject,
+
+            items:
+
+                applyItemOverride(
+
+                    subject,
+
+                    date
+
+                )
+
+        });
+
+    }
+
+    return result;
+
+}
+
+function getTimetableForDate(date) {
+
+    const day = date.getDay();
+
+    if (day === 0 || day === 6) {
+        return [];
+    }
+
+    const weekday =
+        WEEKDAYS[
+            day - 1
+        ];
+
+    return [
+
+        ...(timetable[weekday] ?? [])
+
+    ];
 
 }

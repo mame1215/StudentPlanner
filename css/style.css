@@ -24,6 +24,14 @@ h1 {
 
     border-radius: 12px 12px 0 0;
 
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+
 }
 
 .tab-button {
@@ -142,6 +150,16 @@ button {
     margin-top: 10px;
 }
 
+input[type="color"] {
+    width: 48px;
+
+    height: 40px;
+
+    padding: 0;
+
+    border-radius: 8px;
+}
+
 #taskInput {
     flex: 1;
     width: 100%;
@@ -181,6 +199,12 @@ select {
         no-repeat right 12px center;
     
     padding-right: 36px;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 select:focus {
@@ -237,6 +261,36 @@ select:focus {
 
 #addTaskButton:active {
     transform: scale(0.97);
+}
+
+.add-button {
+
+    padding: 8px 16px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #4285F4;
+
+    color: white;
+
+    font-size: 0.95rem;
+
+    cursor: pointer;
+
+    transition: background .2s;
+
+    margin-top: 12px;
+
+    margin-left: 12px;
+
+}
+
+.add-button:hover {
+
+    background: #3367d6;
+
 }
 
 .task-content {
@@ -817,4 +871,438 @@ textarea:focus {
 
     background: white;
 
+}
+
+#itemPage details {
+
+    margin-top: 4px;
+
+}
+
+#itemPage details details {
+
+    margin-left: 20px;
+
+}
+
+#itemPage ul {
+
+    margin: 6px 0 6px 24px;
+
+    padding-left: 18px;
+
+}
+
+#itemPage summary {
+
+    cursor: pointer;
+
+}
+
+#itemPage > details {
+
+    margin-bottom: 12px;
+
+}
+
+#itemPage > details > details {
+
+    margin-left: 20px;
+
+}
+
+#itemPage > details > details > details {
+
+    margin-left: 20px;
+
+}
+
+.item-action-button {
+
+    margin-left: 8px;
+
+    padding: 2px 8px;
+
+    font-size: 0.75rem;
+
+    border: 1px solid #bbb;
+
+    border-radius: 5px;
+
+    background: #fff;
+
+    cursor: pointer;
+
+    transition: .15s;
+
+    white-space: nowrap;
+
+    min-width: 48px;
+
+}
+
+.item-action-button:hover {
+
+    background: #f3f3f3;
+}
+
+.item-remove-button {
+
+    border: 1px solid #e57373;
+
+    color: #c62828;
+
+}
+
+.item-remove-button:hover {
+
+    background: #ffebee;
+
+}
+
+.item-restore-button {
+
+    border: 1px solid #81c784;
+
+    color: #2e7d32;
+
+}
+
+.item-restore-button:hover {
+
+    background: #e8f5e9;
+
+}
+
+.removed-item {
+    opacity: 0.65;
+}
+
+.removed-item .item-name {
+    color: #999;
+
+    text-decoration: line-through;
+}
+
+.home-item-name {
+
+    font-weight: 600;
+
+}
+
+.home-item-source {
+
+    margin-left: 16px;
+
+    font-size: 0.85rem;
+
+    color: #777;
+
+}
+
+.home-item-list {
+    margin-left: 1.2rem;
+}
+
+#calendarTitle {
+    position: absolute;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: 1.2rem;
+    
+    font-weight: bold;
+    
+    pointer-events: none;
+}
+
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.calendar th,
+.calendar td {
+    border: 1px solid #ddd;
+    width: calc(100% / 7);
+}
+
+.calendar th {
+    height: 32px;
+}
+
+.calendar-cell {
+    height: 110px;
+    vertical-align: top;
+    padding: 4px;
+}
+
+.calendar-date {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.calendar-header {
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.calendar-entry {
+    display: block;
+
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    margin-bottom: 2px;
+
+    padding: 1px 4px;
+
+    border-radius: 4px;
+
+    background: #f3f3f3;
+}
+
+.calendar-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.calendar-button {
+
+    width: 32px;
+
+    height: 32px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-size: 1.4rem;
+
+    line-height: 1;
+
+    transition: background .2s;
+
+}
+
+.calendar-button:hover {
+
+    background: #eeeeee;
+
+}
+
+.calendar-sunday {
+    color: #e57373;
+}
+
+.calendar-saturday {
+    color: #64b5f6;
+}
+
+.calendar-holiday {
+    color: #e57373;
+}
+
+.calendar-holiday-name {
+    color: #e57373;
+
+    font-size: 0.7rem;
+
+    margin-bottom: 4px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.today {
+
+    background: #fff8d9;
+
+}
+
+.other-month {
+    color: #aaa;
+
+    background: #fafafa;
+}
+
+.calendar-todo {
+    background: #e3f2fd;
+}
+
+.calendar-event {
+    background: #fff3cd;
+}
+
+.calendar-entry.completed {
+    opacity: .5;
+
+    text-decoration: line-through;
+}
+
+.calendar-more {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.calendar-today-button {
+    height: 32px;
+
+    padding: 0 14px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 16px;
+
+    background: white;
+
+    cursor: pointer;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    line-height: 1;
+
+    font-size: .9rem;
+}
+
+.calendar-today-button:hover {
+    background: #f5f5f5;
+}
+
+.selected-schedule-entry {
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    margin-bottom: 8px;
+
+    cursor: pointer;
+
+}
+
+.selected-schedule-entry:hover {
+    background: #f7f7f7;
+}
+
+.schedule-todo {
+
+    border-left: 4px solid #64b5f6;
+
+}
+
+.schedule-todo.completed {
+    text-decoration: line-through;
+}
+
+.schedule-event {
+
+    border-left: 4px solid #ffb74d;
+
+}
+
+.schedule-time {
+
+    font-size: .85rem;
+
+    color: #666;
+
+    margin-bottom: 4px;
+
+}
+
+.schedule-title {
+
+    font-weight: bold;
+
+}
+
+.selected-date {
+    outline: 3px solid #4285f4;
+
+    outline-offset: -3px;
+}
+
+.collapse-button {
+
+    width: 100%;
+
+    padding: 10px 14px;
+
+    margin-bottom: 10px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    background: #f7f7f7;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-weight: bold;
+}
+
+.collapse-button:hover {
+    background: #efefef;
+}
+
+.collapsed {
+    display: none;
+}
+
+.timetable {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.timetable select {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    font-size: 0.6rem;
+}
+
+.timetable th:first-child,
+.timetable td:first-child {
+    width: 38px;
+
+    white-space: nowrap;
 }

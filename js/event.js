@@ -222,6 +222,9 @@ async function submitEvent() {
 
     renderEvents(events);
 
+    refreshItems();
+    refreshHome();
+
     clearEventForm();
 
 }
@@ -502,6 +505,9 @@ function createEventActions(event) {
         deleteEvent(event.id);
 
         renderEvents(events);
+
+        refreshItems();
+        refreshHome();
     });
 
     editButton.addEventListener("click", () => {
@@ -595,6 +601,9 @@ saveEventButton.addEventListener("click", async () => {
     saveEvents();
 
     renderEvents(events);
+
+    refreshItems();
+    refreshHome();
 
     closeEditEventModal();
 

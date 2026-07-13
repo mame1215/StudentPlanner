@@ -82,3 +82,61 @@ const priorityText = [
     "高",
     "最優先"
 ];
+
+const WEEKDAYS = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday"
+];
+
+const WEEKDAY_NAMES = {
+
+    monday: "月",
+
+    tuesday: "火",
+
+    wednesday: "水",
+
+    thursday: "木",
+
+    friday: "金"
+};
+
+const CALENDAR_WEEKDAYS = [
+    "日",
+    "月",
+    "火",
+    "水",
+    "木",
+    "金",
+    "土"
+];
+
+let periodCounts = {
+
+    monday: 7,
+
+    tuesday: 6,
+
+    wednesday: 7,
+
+    thursday: 6,
+
+    friday: 6
+};
+
+let timetable = {};
+
+function initializeTimetable() {
+
+    timetable = {};
+
+    for (const weekday of WEEKDAYS) {
+
+        timetable[weekday] = Array(
+            periodCounts[weekday]
+        ).fill(null);
+    }
+}

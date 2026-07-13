@@ -253,6 +253,10 @@ function submitTask() {
     if(form.title !== ""){
         addTask(form);
         renderTasks(tasks);
+
+        refreshItems();
+        refreshHome();
+
         taskInput.value = "";
         dueInput.value = "";
         memoInput.value = "";
@@ -503,6 +507,9 @@ function createActions(task){
     deleteButton.addEventListener("click",function () {
         deleteTask(task.id);
         renderTasks(tasks);
+
+        refreshItems();
+        refreshHome();
     });
 
     editButton.addEventListener("click", function () {
@@ -565,6 +572,7 @@ function createCheckbox(task) {
                 : null;
         saveTasks();
         renderTasks(tasks);
+        refreshHome();
     });
 
     return checkbox;
@@ -880,6 +888,10 @@ saveButton.addEventListener("click", function () {
 
         saveTasks();
         renderTasks(tasks);
+
+        refreshItems();
+        refreshHome();
+
         closeEditModal();
     }
 
