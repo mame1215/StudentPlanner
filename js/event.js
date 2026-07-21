@@ -41,6 +41,41 @@ const eventAddItemButton =
 const addEventButton =
     document.getElementById("addEventButton");
 
+const eventRepeatType =
+    document.getElementById("eventRepeatType");
+
+const repeatOptions =
+    document.getElementById("repeatOptions");
+
+const eventRepeatInterval =
+    document.getElementById("eventRepeatInterval");
+
+const repeatIntervalLabel =
+    document.getElementById("repeatIntervalLabel");
+
+const repeatWeekdays =
+    document.getElementById("repeatWeekdays");
+
+const singleDateInputs =
+    document.getElementById(
+        'singleDateInputs'
+    );
+
+const repeatTimeInputs =
+    document.getElementById(
+        'repeatTimeInputs'
+    );
+
+const eventStartTime =
+    document.getElementById(
+        'eventStartTime'
+    );
+
+const eventEndTime =
+    document.getElementById(
+        'eventEndTime'
+    );
+
 
 
 const eventModal =
@@ -73,11 +108,37 @@ const editEventItemInput =
 const editEventAddItemButton =
     document.getElementById("editEventAddItemButton");
 
+const editSingleDateInputs =
+    document.getElementById(
+        'editSingleDateInputs'
+    );
+
+const editRepeatTimeInputs =
+    document.getElementById(
+        'editRepeatTimeInputs'
+    );
+
+const editEventStartTime =
+    document.getElementById(
+        'editEventStartTime'
+    );
+
+const editEventEndTime =
+    document.getElementById(
+        'editEventEndTime'
+    );
+
 const saveEventButton =
     document.getElementById("saveEventButton");
 
 const cancelEventButton =
     document.getElementById("cancelEventButton");
+
+const editEventRepeatType = document.getElementById("editEventRepeatType");
+const editRepeatOptions = document.getElementById("editRepeatOptions");
+const editEventRepeatInterval = document.getElementById("editEventRepeatInterval");
+const editRepeatIntervalLabel = document.getElementById("editRepeatIntervalLabel");
+const editRepeatWeekdays = document.getElementById("editRepeatWeekdays");
 
 function saveEvents() {
 
@@ -103,16 +164,41 @@ function loadEvents() {
 
 function getEventFormData() {
 
+    const repeating =
+        eventRepeatType.value !== 'none';
+
+    let start;
+    let end;
+
+    if (repeating) {
+
+        const today = new Date();
+
+        const datePart =
+            today.toISOString().slice(0, 10);
+
+        start =
+            `${datePart}T${eventStartTime.value}`;
+
+        end =
+            `${datePart}T${eventEndTime.value}`;
+
+    } else {
+
+        start = eventStartInput.value;
+
+        end = eventEndInput.value;
+
+    }
+
     return {
 
         title:
             eventTitleInput.value.trim(),
 
-        start:
-            eventStartInput.value,
+        start,
 
-        end:
-            eventEndInput.value,
+        end,
 
         allDay: false,
 
@@ -126,7 +212,15 @@ function getEventFormData() {
             [...eventItems],
 
         memo:
-            eventMemoInput.value.trim()
+            eventMemoInput.value.trim(),
+
+        repeat: {
+            enabled: eventRepeatType.value !== "none",
+            frequency: eventRepeatType.value,
+            interval: Number(eventRepeatInterval.value),
+            weekdays:
+                [...repeatWeekdays.querySelectorAll("input:checked")].map(input => Number(input.value))
+        }
 
     };
 
@@ -134,16 +228,39 @@ function getEventFormData() {
 
 function getEditEventFormData() {
 
+    const repeating =
+        editEventRepeatType.value !== 'none';
+
+    let start;
+    let end;
+
+    if (repeating) {
+
+        const originalDate =
+            editEventStart.value.slice(0, 10);
+
+        start =
+            `${originalDate}T${editEventStartTime.value}`;
+
+        end =
+            `${originalDate}T${editEventEndTime.value}`;
+
+    } else {
+
+        start = editEventStart.value;
+
+        end = editEventEnd.value;
+
+    }
+
     return {
 
         title:
             editEventTitle.value.trim(),
 
-        start:
-            editEventStart.value,
+        start,
 
-        end:
-            editEventEnd.value,
+        end,
 
         allDay: false,
 
@@ -157,7 +274,15 @@ function getEditEventFormData() {
             [...editEventItems],
 
         memo:
-            editEventMemo.value.trim()
+            editEventMemo.value.trim(),
+
+        repeat: {
+            enabled: editEventRepeatType.value !== "none",
+            frequency: editEventRepeatType.value,
+            interval: Number(editEventRepeatInterval.value),
+            weekdays:
+                [...editRepeatWeekdays.querySelectorAll("input:checked")].map(input => Number(input.value))
+        }
 
     };
 
@@ -170,6 +295,9 @@ function clearEventForm() {
     eventStartInput.value = "";
 
     eventEndInput.value = "";
+
+    eventStartTime.value = '16:00';
+    eventEndTime.value = '18:00';
 
     eventSubjectInput.value = "";
 
@@ -190,6 +318,18 @@ function clearEventForm() {
         checkbox.checked = false;
 
     }
+
+    eventRepeatType.value = "none";
+
+    eventRepeatInterval.value = 1;
+
+    repeatWeekdays
+        .querySelectorAll("input")
+        .forEach(
+            input => input.checked = false
+        );
+
+    updateRepeatOptions();
 
 }
 
@@ -249,7 +389,9 @@ function addEvent(form) {
 
         items: [...form.items],
 
-        memo: form.memo
+        memo: form.memo,
+
+        repeat: form.repeat
 
     });
 
@@ -273,6 +415,8 @@ function updateEvent(event, form) {
     event.items = [...form.items];
 
     event.memo = form.memo;
+
+    event.repeat = form.repeat;
 
 }
 
@@ -321,6 +465,65 @@ function openEditEventModal(event) {
             );
 
     }
+
+    const repeat =
+
+        event.repeat
+
+        ??
+
+        {
+
+            enabled: false,
+
+            frequency: "none",
+
+            interval: 1,
+
+            weekdays: []
+
+        };
+
+    editEventRepeatType.value =
+        repeat.frequency;
+
+    editEventRepeatInterval.value =
+        repeat.interval;
+
+    if (repeat.enabled) {
+
+        const startDate = new Date(event.start);
+        const endDate = new Date(event.end);
+
+        editEventStartTime.value =
+            `${String(startDate.getHours()).padStart(2, '0')}:` +
+            `${String(startDate.getMinutes()).padStart(2, '0')}`;
+
+        editEventEndTime.value =
+            `${String(endDate.getHours()).padStart(2, '0')}:` +
+            `${String(endDate.getMinutes()).padStart(2, '0')}`;
+
+    }
+
+    editRepeatWeekdays
+
+        .querySelectorAll("input")
+
+        .forEach(
+
+            input =>
+
+                input.checked =
+
+                    repeat.weekdays.includes(
+
+                        Number(input.value)
+
+                    )
+
+        );
+
+    updateEditRepeatOptions();
 
     previousEditEventSubjectId =
         editEventSubject.value;
@@ -520,6 +723,112 @@ function createEventActions(event) {
 
 }
 
+function updateRepeatOptions() {
+
+    const type = eventRepeatType.value;
+
+    // 繰り返しなし
+    if (type === 'none') {
+
+        // 日時入力を表示
+        singleDateInputs.classList.remove('hidden');
+
+        // 繰り返し関連を非表示
+        repeatOptions.classList.add('hidden');
+        repeatTimeInputs.classList.add('hidden');
+        repeatWeekdays.classList.add('hidden');
+
+        return;
+
+    }
+
+    // 繰り返しあり
+
+    // 日時入力を非表示
+    singleDateInputs.classList.add('hidden');
+
+    // 繰り返し設定を表示
+    repeatOptions.classList.remove('hidden');
+    repeatTimeInputs.classList.remove('hidden');
+
+    // 曜日は毎週のときだけ表示
+    if (type === 'week') {
+
+        repeatWeekdays.classList.remove('hidden');
+
+    } else {
+
+        repeatWeekdays.classList.add('hidden');
+
+    }
+
+    const labels = {
+
+        day: '日ごと',
+
+        week: '週間ごと',
+
+        month: 'か月ごと',
+
+        year: '年ごと'
+
+    };
+
+    repeatIntervalLabel.textContent =
+        labels[type] ?? '日ごと';
+
+}
+
+function updateEditRepeatOptions() {
+
+    const type = editEventRepeatType.value;
+
+    // 繰り返しなし
+    if (type === 'none') {
+
+        editSingleDateInputs.classList.remove('hidden');
+
+        editRepeatOptions.classList.add('hidden');
+        editRepeatTimeInputs.classList.add('hidden');
+        editRepeatWeekdays.classList.add('hidden');
+
+        return;
+
+    }
+
+    // 繰り返しあり
+    editSingleDateInputs.classList.add('hidden');
+
+    editRepeatOptions.classList.remove('hidden');
+    editRepeatTimeInputs.classList.remove('hidden');
+
+    if (type === 'week') {
+
+        editRepeatWeekdays.classList.remove('hidden');
+
+    } else {
+
+        editRepeatWeekdays.classList.add('hidden');
+
+    }
+
+    const labels = {
+
+        day: '日ごと',
+
+        week: '週間ごと',
+
+        month: 'か月ごと',
+
+        year: '年ごと'
+
+    };
+
+    editRepeatIntervalLabel.textContent =
+        labels[type] ?? '日ごと';
+
+}
+
 
 
 eventAddItemButton.addEventListener("click", () => {
@@ -667,4 +976,15 @@ function initializeEvent() {
     loadTags(editEventTagInput);
 
     renderEvents(events);
+
+    eventRepeatType.addEventListener(
+
+        "change",
+
+        updateRepeatOptions
+
+    );
+    updateRepeatOptions();
+    editEventRepeatType.addEventListener("change", updateEditRepeatOptions);
+    updateEditRepeatOptions();
 }

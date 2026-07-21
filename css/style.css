@@ -10,6 +10,10 @@ h1 {
     color: #333;
 }
 
+.hidden {
+    display: none;
+}
+
 .tabs {
 
     display: flex;

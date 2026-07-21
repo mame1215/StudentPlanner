@@ -215,25 +215,128 @@
 
                 <div class="plan-row">
 
-                    <input
-                        id="eventStartInput"
-                        class="text-input"
-                        type="datetime-local"
-                    >
+                    <div id="singleDateInputs">
 
-                    <span class="range-separator">
-                        ～
-                    </span>
+                        <label for="eventStart">開始日時</label>
+                        <input
+                            class="text-input"
+                            type="datetime-local"
+                            id="eventStart">
 
-                    <input
-                        id="eventEndInput"
-                        class="text-input"
-                        type="datetime-local"
-                    >
+                        <label for="eventEnd">終了日時</label>
+                        <input
+                            class="text-input"
+                            type="datetime-local"
+                            id="eventEnd">
+
+                    </div>
+
+                    <div id="repeatTimeInputs" class="hidden">
+
+                        <label for="eventStartTime">開始時刻</label>
+                        <input
+                            class="text-input"
+                            type="time"
+                            id="eventStartTime"
+                            value="16:00">
+
+                        <label for="eventEndTime">終了時刻</label>
+                        <input
+                            class="text-input"
+                            type="time"
+                            id="eventEndTime"
+                            value="18:00">
+
+                    </div>
 
                 </div>
 
             </div>
+
+
+
+            <label for="eventRepeatType">
+                繰り返し
+            </label>
+
+            <select id="eventRepeatType">
+
+                <option value="none">
+                    繰り返しなし
+                </option>
+
+                <option value="day">
+                    毎日
+                </option>
+
+                <option value="week">
+                    毎週
+                </option>
+
+                <option value="month">
+                    毎月
+                </option>
+
+                <option value="year">
+                    毎年
+                </option>
+
+            </select>
+
+            <div
+                id="repeatOptions"
+                class="repeat-options hidden">
+
+                <div class="form-group">
+
+                    <label>
+                        間隔
+                    </label>
+
+                    <div class="repeat-interval">
+
+                        <input
+                            id="eventRepeatInterval"
+                            type="number"
+                            min="1"
+                            value="1">
+
+                        <span
+                            id="repeatIntervalLabel">
+
+                            日ごと
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="repeatWeekdays"
+                    class="hidden">
+
+                    <label>
+                        曜日
+                    </label>
+
+                    <div class="weekday-selector">
+
+                        <label><input type="checkbox" value="0">日</label>
+                        <label><input type="checkbox" value="1">月</label>
+                        <label><input type="checkbox" value="2">火</label>
+                        <label><input type="checkbox" value="3">水</label>
+                        <label><input type="checkbox" value="4">木</label>
+                        <label><input type="checkbox" value="5">金</label>
+                        <label><input type="checkbox" value="6">土</label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
 
             <div class="input-area-row">
 
@@ -560,17 +663,120 @@
                 type="text"
                 id="editEventTitle">
 
-            <label for="editEventStart">開始日時</label>
-            <input
-                class="text-input"
-                type="datetime-local"
-                id="editEventStart">
+            <div id="editSingleDateInputs">
 
-            <label for="editEventEnd">終了日時</label>
-            <input
-                class="text-input"
-                type="datetime-local"
-                id="editEventEnd">
+                <label for="editEventStart">開始日時</label>
+                <input
+                    class="text-input"
+                    type="datetime-local"
+                    id="editEventStart">
+
+                <label for="editEventEnd">終了日時</label>
+                <input
+                    class="text-input"
+                    type="datetime-local"
+                    id="editEventEnd">
+
+            </div>
+
+            <div id="editRepeatTimeInputs" class="hidden">
+
+                <label for="editEventStartTime">開始時刻</label>
+                <input
+                    class="text-input"
+                    type="time"
+                    id="editEventStartTime"
+                    value="16:00">
+
+                <label for="editEventEndTime">終了時刻</label>
+                <input
+                    class="text-input"
+                    type="time"
+                    id="editEventEndTime"
+                    value="18:00">
+
+            </div>
+
+            <label for="editEventRepeatType">
+                繰り返し
+            </label>
+
+            <select id="editEventRepeatType">
+
+                <option value="none">
+                    繰り返しなし
+                </option>
+
+                <option value="day">
+                    毎日
+                </option>
+
+                <option value="week">
+                    毎週
+                </option>
+
+                <option value="month">
+                    毎月
+                </option>
+
+                <option value="year">
+                    毎年
+                </option>
+
+            </select>
+
+            <div
+                id="editRepeatOptions"
+                class="repeat-options hidden">
+
+                <div class="form-group">
+
+                    <label>
+                        間隔
+                    </label>
+
+                    <div class="repeat-interval">
+
+                        <input
+                            id="editEventRepeatInterval"
+                            type="number"
+                            min="1"
+                            value="1">
+
+                        <span
+                            id="editRepeatIntervalLabel">
+
+                            日ごと
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="editRepeatWeekdays"
+                    class="hidden">
+
+                    <label>
+                        曜日
+                    </label>
+
+                    <div class="weekday-selector">
+
+                        <label><input type="checkbox" value="0">日</label>
+                        <label><input type="checkbox" value="1">月</label>
+                        <label><input type="checkbox" value="2">火</label>
+                        <label><input type="checkbox" value="3">水</label>
+                        <label><input type="checkbox" value="4">木</label>
+                        <label><input type="checkbox" value="5">金</label>
+                        <label><input type="checkbox" value="6">土</label>
+
+                    </div>
+
+                </div>
+
+            </div>
 
             <label>教科</label>
             <select id="editEventSubject"></select>

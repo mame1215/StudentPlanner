@@ -43,7 +43,14 @@ let events = [
 
         items: [],
 
-        memo: ""
+        memo: "",
+
+        repeat: {
+            enabled: false,
+            frequency: "none",
+            interval: 1,
+            weekdays: []
+        }
     }
     
 ];

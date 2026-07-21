@@ -224,15 +224,14 @@ function collectItemsForDate(date) {
 
     }
 
-    for (const event of events) {
+    const dayEvents = getEventsInRange(date, date);
 
-        if (event.items.length === 0) {
+    for (const event of dayEvents) {
 
-            continue;
-
-        }
-
-        if (!isSameDate(event.start, date)) {
+        if (
+            !event.items ||
+            event.items.length === 0
+        ) {
 
             continue;
 
@@ -244,6 +243,7 @@ function collectItemsForDate(date) {
 
             subject:
                 subjects.find(
+
                     subject =>
                         subject.id ===
                         event.subjectId
@@ -254,8 +254,8 @@ function collectItemsForDate(date) {
 
             items: event.items.map(name => ({
                 name,
-                removed:false,
-                added:false
+                removed: false,
+                added: false
             })),
 
             data:

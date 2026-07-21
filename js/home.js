@@ -180,52 +180,42 @@ function getScheduleEntries(
 
     const entries = [];
 
-    for (const event of events) {
+    // イベント
+    const rangeEvents =
+        getEventsInRange(
+            startDate,
+            endDate
+        );
 
-        if (
-            !event.start ||
-            !isDateInRange(
-                event.start,
-                startDate,
-                endDate
-            )
-        ) {
-
-            continue;
-
-        }
+    for (const event of rangeEvents) {
 
         entries.push({
 
-            type: "event",
+            type: 'event',
 
             subject:
-
                 subjects.find(
-
                     subject =>
-
                         subject.id ===
                         event.subjectId
-
                 ) ?? null,
 
-            title:
-                event.title,
+            title: event.title,
 
-            start:
-                event.start,
+            start: event.start,
 
-            end:
-                event.end,
+            end: event.end,
 
             data:
-                event
+                events.find(
+                    e => e.id === event.originalId
+                ) ?? event
 
         });
 
     }
 
+    // Todo
     for (const task of tasks) {
 
         if (
@@ -243,30 +233,22 @@ function getScheduleEntries(
 
         entries.push({
 
-            type: "todo",
+            type: 'todo',
 
             subject:
-
                 subjects.find(
-
                     subject =>
-
                         subject.id ===
                         task.subjectId
-
                 ) ?? null,
 
-            title:
-                task.title,
+            title: task.title,
 
-            due:
-                task.due,
+            due: task.due,
 
-            completed:
-                task.completed,
+            completed: task.completed,
 
-            data:
-                task
+            data: task
 
         });
 
@@ -493,6 +475,212 @@ function getEntryDate(entry) {
             : entry.due
 
     ).slice(0, 10);
+
+}
+
+function occursOnDate(event, date) {
+
+    const start = new Date(event.start);
+
+    // 繰り返しなし
+    if (
+        !event.repeat ||
+        !event.repeat.enabled ||
+        event.repeat.frequency === 'none'
+    ) {
+
+        return isSameDate(start, date);
+
+    }
+
+    const repeat = event.repeat;
+
+    // 開始日より前には出さない
+    if (stripTime(date) < stripTime(start)) {
+
+        return false;
+
+    }
+
+    switch (repeat.frequency) {
+
+        case 'day':
+
+            return (
+                getDayDifference(start, date) %
+                repeat.interval === 0
+            );
+
+        case 'week':
+
+            if (
+                !repeat.weekdays.includes(
+                    date.getDay()
+                )
+            ) {
+
+                return false;
+
+            }
+
+            return (
+                Math.floor(
+                    getDayDifference(start, date) / 7
+                ) %
+                repeat.interval === 0
+            );
+
+        case 'month':
+
+            return (
+                date.getDate() === start.getDate() &&
+                getMonthDifference(start, date) %
+                    repeat.interval ===
+                    0
+            );
+
+        case 'year':
+
+            return (
+                date.getDate() === start.getDate() &&
+                date.getMonth() === start.getMonth() &&
+                (date.getFullYear() -
+                    start.getFullYear()) %
+                    repeat.interval ===
+                    0
+            );
+
+    }
+
+    return false;
+
+}
+
+function combineDateAndTime(date, original) {
+
+    const source = new Date(original);
+
+    const result = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        source.getHours(),
+        source.getMinutes()
+    );
+
+    return toDateTimeLocalString(result);
+
+}
+
+function stripTime(date) {
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+    );
+}
+
+function getDayDifference(a, b) {
+    const oneDay = 86400000;
+
+    return Math.floor(
+        (stripTime(b) - stripTime(a)) / oneDay
+    );
+}
+
+function getMonthDifference(a, b) {
+    return (
+        (b.getFullYear() - a.getFullYear()) * 12 +
+        (b.getMonth() - a.getMonth())
+    );
+}
+
+function toDateTimeLocalString(date) {
+
+    const pad = n => String(n).padStart(2, '0');
+
+    return (
+        `${date.getFullYear()}-` +
+        `${pad(date.getMonth() + 1)}-` +
+        `${pad(date.getDate())}T` +
+        `${pad(date.getHours())}:` +
+        `${pad(date.getMinutes())}`
+    );
+
+}
+
+function expandEvent(
+    event,
+    startDate,
+    endDate
+) {
+
+    const result = [];
+
+    let current = new Date(startDate);
+
+    while (current <= endDate) {
+
+        const date = new Date(current);
+
+        if (occursOnDate(event, date)) {
+
+            result.push({
+
+                ...event,
+
+                start: combineDateAndTime(
+                    date,
+                    event.start
+                ),
+
+                end: combineDateAndTime(
+                    date,
+                    event.end
+                ),
+
+                originalId: event.id
+
+            });
+
+        }
+
+        current.setDate(
+            current.getDate() + 1
+        );
+
+    }
+
+    return result;
+
+}
+
+function getEventsInRange(
+    startDate,
+    endDate
+) {
+
+    const result = [];
+
+    for (const event of events) {
+
+        if (!event.start) {
+
+            continue;
+
+        }
+
+        result.push(
+            ...expandEvent(
+                event,
+                startDate,
+                endDate
+            )
+        );
+
+    }
+
+    return result;
 
 }
 
