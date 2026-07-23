@@ -83,7 +83,14 @@ Student Planner は JavaScript・HTML・CSS のみで構成する。
 
     items: [],
 
-    memo
+    memo,
+
+    repeat: {
+        enabled,
+        frequency,
+        interval,
+        weekdays
+    }
 }
 ```
 
@@ -98,6 +105,14 @@ Student Planner は JavaScript・HTML・CSS のみで構成する。
 ### items
 
 このイベント固有の持ち物
+
+### repeat
+
+イベントの繰り返し設定
+
+### weekdays
+
+繰り返しが週単位のとき、曜日により設定可能
 
 ---
 
@@ -140,10 +155,12 @@ style.css
 js/
     app.js
 
+    home.js
+
     todo.js
     event.js
 
-    common.js
+    data.js
 
     storage.js
 
@@ -162,6 +179,21 @@ js/
 - 各モジュールの起動
 
 ビジネスロジックは持たない。
+
+---
+
+## home.js
+
+ホームタブ
+
+- その日の持ち物
+- その日の予定
+- その日にやるtodo
+- その日の時間割
+- カレンダー
+
+カレンダーからは予定の編集が可能
+その他は編集不可
 
 ---
 
@@ -226,7 +258,7 @@ Todo とほぼ同じ構造で実装する。
 
 localStorage管理
 
-保存・読込のみ担当する予定。
+保存・読込のみ担当する予定（未実装）。
 
 ---
 
@@ -240,12 +272,9 @@ localStorage管理
 
 設定画面
 
-担当予定
-
 - 教科
 - タグ
 - 時間割
-- 教科規定持ち物
 
 ---
 
@@ -260,8 +289,7 @@ localStorage管理
 表示内容
 
 - 今日の持ち物
-- 今日期限のTodo
-- 今日作業予定のTodo
+- 今日期限のTodo, 今日作業予定のTodo
 - 今日のイベント
 - 今日の時間割
 - Todo・Eventを統合したカレンダー
@@ -319,7 +347,6 @@ Subject.defaultItems
 # 設計ルール
 
 - 関数は責務を小さくする
-- 共通処理は common.js にまとめる
 - localStorage は将来 storage.js に分離する
 - Todo と Event はできるだけ同じ構造で実装する
 - UI・CSS のデザインを統一する

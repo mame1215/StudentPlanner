@@ -221,13 +221,13 @@
                         <input
                             class="text-input"
                             type="datetime-local"
-                            id="eventStart">
+                            id="eventStartInput">
 
                         <label for="eventEnd">終了日時</label>
                         <input
                             class="text-input"
                             type="datetime-local"
-                            id="eventEnd">
+                            id="eventEndInput">
 
                     </div>
 
@@ -821,6 +821,14 @@
             <div class="modal-buttons">
 
                 <button
+                    id="deleteEventButton"
+                    class="danger-button">
+                
+                    削除
+
+                </button>
+
+                <button
                     id="cancelEventButton"
                     class="secondary-button">
 
@@ -1022,6 +1030,15 @@
                     type="button">
 
                     キャンセル
+
+                </button>
+
+                <button
+                    id="confirmSecondary"
+                    class="secondary-button hidden"
+                    type="button">
+                
+                    この予定のみ
 
                 </button>
 

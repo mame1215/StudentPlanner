@@ -8,6 +8,9 @@ let previousEditEventSubjectId = "";
 
 let editingEventId = null;
 
+let editingOccurrenceDate = null;
+let editingSingleOccurrence = false;
+
 const eventList = document.getElementById("eventList");
 const openAddEventButton = document.getElementById("openAddEventButton");
 
@@ -133,6 +136,9 @@ const saveEventButton =
 
 const cancelEventButton =
     document.getElementById("cancelEventButton");
+
+const deleteEventButton =
+    document.getElementById("deleteEventButton");
 
 const editEventRepeatType = document.getElementById("editEventRepeatType");
 const editRepeatOptions = document.getElementById("editRepeatOptions");
@@ -391,7 +397,9 @@ function addEvent(form) {
 
         memo: form.memo,
 
-        repeat: form.repeat
+        repeat: form.repeat,
+
+        exceptions: []
 
     });
 
@@ -417,6 +425,8 @@ function updateEvent(event, form) {
     event.memo = form.memo;
 
     event.repeat = form.repeat;
+
+    event.exceptions ??= [];
 
 }
 
@@ -542,8 +552,51 @@ function closeEditEventModal() {
 
     editingEventId = null;
 
+    editingOccurrenceDate = null;
+    editingSingleOccurrence = false;
+
     document.activeElement.blur();
 
+}
+
+async function openEventEditMode(event) {
+
+    const isRecurring = event.repeat?.enabled && event.repeat.frequency !== "none";
+    const hasOccurrence = event.occurrenceDate != null;
+
+    if (!isRecurring || !hasOccurrence) {
+        editingSingleOccurrence = false;
+        editingOccurrenceDate = null;
+        openEditEventModal(event);
+        return;
+    }
+    
+    const choice = await showRecurrenceDialog("繰り返しイベントを編集しますか？");
+
+    if (choice === "single") {
+        editingSingleOccurrence = true;
+
+        editingOccurrenceDate =
+            event.occurenceDate ??
+            event.start?.slice(0,10);
+
+        openEditEventModal(event);
+    } else if (choice === "all") {
+        editingSingleOccurrence = false;
+        editingOccurrenceDate = null;
+
+        const originalId = event.originalId ?? event.id;
+
+        const original = events.find(
+            e => e.id === originalId
+        );
+
+        if (original) {
+            openEditEventModal(original);
+        }
+    } else {
+        return;
+    }
 }
 
 function sortEvents(eventArray) {
@@ -703,19 +756,89 @@ function createEventActions(event) {
 
     actions.appendChild(deleteButton);
 
-    deleteButton.addEventListener("click", () => {
+    deleteButton.addEventListener("click", async () => {
 
-        deleteEvent(event.id);
+        const isRecurring =
+            event.repeat?.enabled &&
+            event.repeat.frequency !== "none";
+
+        const hasOccurrence =
+            event.occurrenceDate != null;
+
+        // 通常イベント
+        if (!isRecurring || !hasOccurrence) {
+
+            const ok = await showConfirmDialog(
+                "このイベントを削除しますか？"
+            );
+
+            if (!ok) {
+                return;
+            }
+
+            deleteEvent(event.id);
+
+        } else {
+
+            const deleteThisOnly = confirm(
+                "この回だけ削除しますか？\n\nOK: この予定のみ\nキャンセル: すべての予定"
+            );
+
+            if (deleteThisOnly) {
+
+                const originalId =
+                    event.originalId ?? event.id;
+
+                const original = events.find(
+                    e => e.id === originalId
+                );
+
+                if (original) {
+
+                    original.exceptions ??= [];
+
+                    // 同日の既存 skip を重複追加しない
+                    const exists = original.exceptions.some(
+                        exception =>
+                            exception.type === "skip" &&
+                            exception.date === event.occurrenceDate
+                    );
+
+                    if (!exists) {
+
+                        original.exceptions.push({
+                            date: event.occurrenceDate,
+                            type: "skip"
+                        });
+
+                        saveEvents();
+                    }
+                }
+
+            } else {
+
+                const ok = await showConfirmDialog(
+                    "繰り返しイベントをすべて削除しますか？"
+                );
+
+                if (!ok) {
+                    return;
+                }
+
+                deleteEvent(event.originalId ?? event.id);
+            }
+        }
 
         renderEvents(events);
 
         refreshItems();
         refreshHome();
+
     });
 
-    editButton.addEventListener("click", () => {
+    editButton.addEventListener("click", async () => {
 
-        openEditEventModal(event);
+        await openEventEditMode(event);
 
     });
 
@@ -880,6 +1003,12 @@ saveEventButton.addEventListener("click", async () => {
         event => event.id === editingEventId
     );
 
+    const targetEvent = editingSingleOccurrence
+        ? events.find(
+            e => e.id === (event.originalId ?? event.id)
+            )
+        : event;
+
     if (!event) {
 
         return;
@@ -902,12 +1031,102 @@ saveEventButton.addEventListener("click", async () => {
         return;
     }
 
-    updateEvent(
-        event,
-        form
-    );
+    if (editingSingleOccurrence) {
+        targetEvent.exceptions ??= [];
+        targetEvent.exceptions = targetEvent.exceptions.filter(
+            exception =>
+                !(
+                    exception.type === "override" &&
+                    exception.date === editingOccurrenceDate
+                )
+        );
+
+        targetEvent.exceptions.push({
+            date: editingOccurrenceDate,
+            type: "override",
+            title: form.title,
+            start: form.start,
+            end: form.end,
+            subjectId: form.subjectId,
+            tagIds: [...form.tagIds],
+            items: [...form.items],
+            memo: form.memo
+        });
+    } else {
+        updateEvent(event, form);
+    }
 
     saveEvents();
+
+    renderEvents(events);
+
+    refreshItems();
+    refreshHome();
+
+    closeEditEventModal();
+
+});
+
+deleteEventButton.addEventListener("click", async () => {
+
+    const event = events.find(
+        event => event.id === editingEventId
+    );
+
+    if (!event) {
+        return;
+    }
+
+    // この回だけ削除
+    if (editingSingleOccurrence) {
+
+        event.exceptions ??= [];
+
+        // 既存 override を削除
+        event.exceptions = event.exceptions.filter(
+            exception =>
+                !(
+                    exception.type === "override" &&
+                    exception.date === editingOccurrenceDate
+                )
+        );
+
+        // skip を追加
+        const exists = event.exceptions.some(
+            exception =>
+                exception.type === "skip" &&
+                exception.date === editingOccurrenceDate
+        );
+
+        if (!exists) {
+
+            event.exceptions.push({
+                date: editingOccurrenceDate,
+                type: "skip"
+            });
+        }
+
+        saveEvents();
+
+        renderEvents(events);
+        refreshItems();
+        refreshHome();
+
+        closeEditEventModal();
+
+        return;
+    }
+
+    // すべて削除
+    const ok = await showConfirmDialog(
+        "このイベントを削除しますか？"
+    );
+
+    if (!ok) {
+        return;
+    }
+
+    deleteEvent(event.id);
 
     renderEvents(events);
 

@@ -83,6 +83,8 @@ const confirmMessage = document.getElementById("confirmMessage");
 const confirmOk = document.getElementById("confirmOk");
 const confirmCancel = document.getElementById("confirmCancel");
 
+const confirmSecondary = document.getElementById("confirmSecondary");
+
 function sortTasks(taskArray) {
     //期限順に並び替え
     const sortedTasks = [...taskArray];
@@ -397,6 +399,73 @@ function showConfirmDialog(message, showCancel = true) {
             "click",
             cancel
         );
+
+    });
+
+}
+
+function showRecurrenceDialog(message) {
+
+    confirmMessage.textContent = message;
+
+    confirmSecondary.textContent = "この予定のみ";
+    confirmOk.textContent = "すべての予定";
+    confirmCancel.textContent = "キャンセル";
+
+    confirmSecondary.className = "secondary-button";
+    confirmOk.className = "secondary-button";
+
+    confirmCancel.className = "text-button";
+
+    confirmSecondary.classList.remove("hidden");
+    confirmCancel.style.display = "";
+
+    confirmModal.classList.remove("hidden");
+
+    return new Promise(resolve => {
+
+        function close(result) {
+
+            confirmModal.classList.add("hidden");
+
+            // 元に戻す
+            confirmSecondary.classList.add("hidden");
+            confirmOk.textContent = "OK";
+            confirmCancel.textContent = "キャンセル";
+
+            confirmOk.className = "primary-button";
+            confirmCancel.className = "secondary-button";
+            confirmSecondary.className = "secondary-button hidden";
+
+            confirmOk.removeEventListener("click", all);
+            confirmSecondary.removeEventListener("click", single);
+            confirmCancel.removeEventListener("click", cancel);
+
+            resolve(result);
+
+        }
+
+        function single() {
+
+            close("single");
+
+        }
+
+        function all() {
+
+            close("all");
+
+        }
+
+        function cancel() {
+
+            close(null);
+
+        }
+
+        confirmSecondary.addEventListener("click", single);
+        confirmOk.addEventListener("click", all);
+        confirmCancel.addEventListener("click", cancel);
 
     });
 

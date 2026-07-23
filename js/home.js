@@ -206,10 +206,10 @@ function getScheduleEntries(
 
             end: event.end,
 
-            data:
+            data:event/*
                 events.find(
                     e => e.id === event.originalId
-                ) ?? event
+                ) ?? event*/
 
         });
 
@@ -625,23 +625,51 @@ function expandEvent(
 
         if (occursOnDate(event, date)) {
 
-            result.push({
+            const dateKey = formatDateKey(date);
 
-                ...event,
+            const skipException = event.exceptions?.find(
+                exception => 
+                        exception.type === "skip" &&
+                        exception.date === dateKey
+            );
 
-                start: combineDateAndTime(
-                    date,
-                    event.start
-                ),
+            if (skipException) {
+                current.setDate(current.getDate() + 1);
+                continue;
+            }
 
-                end: combineDateAndTime(
-                    date,
-                    event.end
-                ),
+            const overrideException = event.exceptions?.find(
+                exception =>
+                    exception.type === "override" &&
+                    exception.date === dateKey
+            );
 
-                originalId: event.id
+            const instance = overrideException
+                ? {
+                    ...event,
+                    ...overrideException,
 
-            });
+                    originalId: event.id,
+                    occurrenceDate: dateKey
+                }
+                : {
+                    ...event,
+
+                    start: combineDateAndTime(
+                        date,
+                        event.start
+                    ),
+
+                    end: combineDateAndTime(
+                        date,
+                        event.end
+                    ),
+
+                    originalId: event.id,
+                    occurrenceDate: dateKey
+                };
+
+            result.push(instance);
 
         }
 
@@ -1563,13 +1591,13 @@ function createSelectedScheduleEntry(entry) {
 
     div.appendChild(title);
 
-    div.addEventListener("click", () => {
+    div.addEventListener("click", async () => {
         if (entry.type === "todo") {
             openEditModal(entry.data);
         } else {
-            openEditEventModal(entry.data);
+            await openEventEditMode(entry.data);
         }
-    })
+    });
 
     return div;
 }

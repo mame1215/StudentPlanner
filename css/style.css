@@ -510,6 +510,30 @@ li input[type="checkbox"] {
     background: #f3f4f6;
 }
 
+.danger-button {
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.danter-button:hover {
+    background: #b91c1c;
+}
+
+.text-button {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.text-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
 .label {
     padding: 2px 8px;
     border-radius: 999px;
